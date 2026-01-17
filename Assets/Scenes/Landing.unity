@@ -205,7 +205,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BGScroll
   img: {fileID: 166112205}
-  x_speed: 0.05
+  x_speed: 5
   y_speed: 0
 --- !u!1 &194963838
 GameObject:
