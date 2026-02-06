@@ -978,15 +978,6 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-<<<<<<< Updated upstream
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-=======
   m_LocalRotation: {x: 0.13180116, y: -0, z: -0, w: 0.99127614}
   m_LocalPosition: {x: 0, y: 1.599, z: -2.005}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -994,7 +985,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 67445218}
   m_LocalEulerAnglesHint: {x: 15.147, y: 0, z: 0}
->>>>>>> Stashed changes
 --- !u!114 &330585547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2791,11 +2781,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 1.11, y: 0, z: 0}
-<<<<<<< Updated upstream
---- !u!1 &2134705199
-=======
 --- !u!1 &890333238 stripped
->>>>>>> Stashed changes
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2638491222920594240, guid: f0d22fd15120e25458f38cc1b80521ad, type: 3}
   m_PrefabInstance: {fileID: 428926262}
@@ -2806,22 +2792,6 @@ MeshCollider:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-<<<<<<< Updated upstream
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2134705203}
-  - component: {fileID: 2134705202}
-  - component: {fileID: 2134705201}
-  - component: {fileID: 2134705200}
-  m_Layer: 0
-  m_Name: Cube
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!65 &2134705200
-=======
   m_GameObject: {fileID: 890333238}
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -2839,17 +2809,12 @@ MeshCollider:
   m_CookingOptions: 30
   m_Mesh: {fileID: -1856853590822947683, guid: dadc1d4a6d5528d428b167c7b4a3968c, type: 3}
 --- !u!65 &890333243
->>>>>>> Stashed changes
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-<<<<<<< Updated upstream
-  m_GameObject: {fileID: 2134705199}
-=======
   m_GameObject: {fileID: 890333238}
->>>>>>> Stashed changes
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -2860,14 +2825,6 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-<<<<<<< Updated upstream
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!23 &2134705201
-MeshRenderer:
-=======
   m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 7.4667015, y: 4.43122, z: 11.317557}
@@ -2879,15 +2836,10 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
 --- !u!65 &943643521
 BoxCollider:
->>>>>>> Stashed changes
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-<<<<<<< Updated upstream
-  m_GameObject: {fileID: 2134705199}
-  m_Enabled: 1
-=======
   m_GameObject: {fileID: 943643519}
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -3049,7 +3001,6 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1129114701}
   m_Enabled: 1
->>>>>>> Stashed changes
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -3062,11 +3013,6 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
-<<<<<<< Updated upstream
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-=======
->>>>>>> Stashed changes
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3088,55 +3034,30 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-<<<<<<< Updated upstream
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &2134705202
-=======
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &1129114704
->>>>>>> Stashed changes
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-<<<<<<< Updated upstream
-  m_GameObject: {fileID: 2134705199}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!4 &2134705203
-=======
   m_GameObject: {fileID: 1129114701}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!4 &1129114705
->>>>>>> Stashed changes
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-<<<<<<< Updated upstream
-  m_GameObject: {fileID: 2134705199}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 3.62, y: 3.62, z: 3.62}
-  m_ConstrainProportionsScale: 1
-=======
   m_GameObject: {fileID: 1129114701}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 23.8, y: 3.43, z: 8.935}
   m_LocalScale: {x: 23.912384, y: 6.7669535, z: 0.22614}
   m_ConstrainProportionsScale: 0
->>>>>>> Stashed changes
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4633,9 +4554,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 410087041}
   - {fileID: 832575519}
-<<<<<<< Updated upstream
-  - {fileID: 2134705203}
-=======
   - {fileID: 94332836}
   - {fileID: 545527197}
   - {fileID: 428926262}
@@ -4663,4 +4581,3 @@ SceneRoots:
   - {fileID: 722473728}
   - {fileID: 266428220}
   - {fileID: 1362099878}
->>>>>>> Stashed changes
