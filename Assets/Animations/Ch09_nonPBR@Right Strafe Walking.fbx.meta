@@ -1,11 +1,7 @@
 fileFormatVersion: 2
 guid: 4ac063512652c374fac96e2b1007de65
 ModelImporter:
-<<<<<<< Updated upstream
-  serializedVersion: 24200
-=======
   serializedVersion: 22200
->>>>>>> Stashed changes
   internalIDToNameTable: []
   externalObjects: {}
   materials:
@@ -47,11 +43,7 @@ ModelImporter:
       loop: 0
       hasAdditiveReferencePose: 0
       loopTime: 1
-<<<<<<< Updated upstream
-      loopBlend: 0
-=======
       loopBlend: 1
->>>>>>> Stashed changes
       loopBlendOrientation: 0
       loopBlendPositionY: 0
       loopBlendPositionXZ: 0
@@ -93,12 +85,6 @@ ModelImporter:
     maxBonesPerVertex: 4
     minBoneWeight: 0.001
     optimizeBones: 1
-<<<<<<< Updated upstream
-    generateMeshLods: 0
-    meshLodGenerationFlags: 0
-    maximumMeshLod: -1
-=======
->>>>>>> Stashed changes
     meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
