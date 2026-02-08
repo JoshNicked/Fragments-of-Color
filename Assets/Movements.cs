@@ -13,7 +13,7 @@ public class Movements : MonoBehaviour
     //increase performance
     int VelocityZHash = Animator.StringToHash("Velocity Z");
     int VelocityXHash = Animator.StringToHash("Velocity X");
-
+    
     void Start()
     {
         animator = GetComponent<Animator>();

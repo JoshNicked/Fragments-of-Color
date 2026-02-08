@@ -43,8 +43,7 @@ public class PlayerMotor : MonoBehaviour
         playerCamera = GetComponentInChildren<Camera>();
         VelocityZHash = Animator.StringToHash("Velocity Z");
         VelocityXHash = Animator.StringToHash("Velocity X");
-        interactionUI = FindObjectOfType<InteractionUI>();
-        if (interactionUI == null)
+        interactionUI = Object.FindFirstObjectByType<InteractionUI>(); if (interactionUI == null)
             Debug.LogError("No InteractionUI found in scene!");
         // Ensure player starts on ground
         if (controller != null)
