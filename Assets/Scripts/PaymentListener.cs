@@ -25,15 +25,21 @@ public class PaymentListener : MonoBehaviour
             var request = context.Request;
             var response = context.Response;
 
-            if (request.RawUrl.Contains("paymentSuccess"))
-            {
-                UnityEngine.Debug.Log("Payment Received!");
-
-                UnityMainThread.Execute(() =>
+            if (request.Url.AbsolutePath == "/paymentSuccess")
                 {
-                    CurrencyManager.Instance.AddFragments(100);
-                });
-            }
+                    string amountStr = request.QueryString["amount"];
+
+                    if (!string.IsNullOrEmpty(amountStr))
+                    {
+                        int amount = int.Parse(amountStr);
+
+                        UnityMainThread.Execute(() =>
+                        {
+                            CurrencyManager.Instance.AddFragments(amount);
+                            Debug.Log("Fragments Added: " + amount);
+                        });
+                    }
+                }
 
             byte[] buffer = Encoding.UTF8.GetBytes("OK");
             response.OutputStream.Write(buffer, 0, buffer.Length);
