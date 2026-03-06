@@ -8,23 +8,24 @@ public class PlayerLook : MonoBehaviour
     public Camera cam;
     
     [Header("Mouse Sensitivity")]
-    public float xSensitivity = 30f;
-    public float ySensitivity = 30f;
-    
+    public float xSensitivity = 0.5f;
+    public float ySensitivity = 0.5f;
+
+    public float smoothSpeed = 10f;
+    private float currentX;
+    private float currentY;
+
     [Header("Camera Settings")]
     [Range(0f, 90f)]
-    public float maxLookAngle = 80f;
+    public float maxLookAngle = 50f;
     
-    // Private variables
     private float xRotation = 0f;
     
     void Start()
     {
-        // Lock and hide cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         
-        // Initialize camera to center angle
         if (cam != null)
         {
             cam.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
@@ -34,19 +35,16 @@ public class PlayerLook : MonoBehaviour
 
     public void ProcessLook(Vector2 input)
     {
-        // Mouse input from Input System - multiply by sensitivity and deltaTime for smooth frame-independent movement
-        float mouseX = input.x * xSensitivity * Time.deltaTime;
-        float mouseY = input.y * ySensitivity * Time.deltaTime;
-        
-        // Rotate the player body horizontally (Y rotation around world up)
+        float mouseX = input.x * xSensitivity * 10f * Time.deltaTime;
+        float mouseY = input.y * ySensitivity * 10f * Time.deltaTime;
+
+        // Rotate player body
         transform.Rotate(Vector3.up * mouseX);
-        
-        // Calculate vertical camera rotation (X rotation - clamped to prevent over-rotation)
+
+        // Rotate camera up/down
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -maxLookAngle, maxLookAngle);
-        
-        // Apply vertical rotation to camera (local rotation)
+
         cam.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
     }
 }
-
