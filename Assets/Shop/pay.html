@@ -5,7 +5,11 @@
 <script src="ethers.min.js"></script>
 
 <style>
+/* 
+    ===== Run WEb ===== 
+python -m http.server 3000
 
+*/
 body {
     margin:0;
     overflow:hidden;
@@ -112,7 +116,7 @@ button:hover {
 
 <script>
 
-const CONTRACT = "0xbca7E42C524F4043491cD0e5C5842EAf83741F98";
+const CONTRACT = "0x741d70b46E5f4322503f88348d6927Fc1d9b332C";
 
 const params = new URLSearchParams(window.location.search);
 const eth = params.get("eth");
