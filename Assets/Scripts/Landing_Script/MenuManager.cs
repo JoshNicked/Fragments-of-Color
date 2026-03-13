@@ -10,7 +10,6 @@ public class MenuManager : MonoBehaviour
 
     public void ShowLevels()
     {
-        landingPanel.SetActive(false);
         levelsPanel.SetActive(true);
     }
 
@@ -20,7 +19,6 @@ public class MenuManager : MonoBehaviour
         exitPanel.SetActive(false);
         levelsPanel.SetActive(false);
         shopPanel.SetActive(false);
-        landingPanel.SetActive(true);
     }
 
     public void ShowSettings()
