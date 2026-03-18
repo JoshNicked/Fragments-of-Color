@@ -5,38 +5,185 @@
 <script src="ethers.min.js"></script>
 
 <style>
+:root {
+    --panel: #eceff3;
+    --ink: #131921;
+    --muted: #4f5b6b;
+    --line: #1f2937;
+    --primary: #1f2937;
+    --primaryHover: #111827;
+}
+
 body {
-    margin:0;
-    font-family: Arial;
-    background:#111;
-    color:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
+    margin: 0;
+    overflow: hidden;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    color: var(--ink);
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(13, 17, 23, 0.68), rgba(13, 17, 23, 0.55));
+    z-index: -1;
+    pointer-events: none;
+}
+
+.bg {
+    position: fixed;
+    inset: 0;
+    width: 200%;
+    background: url("city.jpg") repeat-x;
+    background-size: auto 100%;
+    filter: grayscale(100%);
+    animation: scrollCity 42s linear infinite;
+    z-index: -2;
+}
+
+@keyframes scrollCity {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
 }
 
 .card {
-    background:#e0e0e0;
-    color:black;
-    padding:40px;
-    border-radius:20px;
-    width:350px;
-    text-align:center;
-    border:3px solid black;
-    box-shadow:5px 5px 0 black;
+    width: min(420px, calc(100vw - 32px));
+    box-sizing: border-box;
+    padding: 34px;
+    border-radius: 18px;
+    background: var(--panel);
+    border: 2px solid var(--line);
+    box-shadow: 10px 10px 0 rgba(10, 10, 10, 0.8);
+    text-align: left;
+}
+
+.hidden {
+    display: none;
+}
+
+.card h2 {
+    margin: 0 0 8px;
+    font-size: 28px;
+    letter-spacing: 0.4px;
+}
+
+.subhead {
+    margin: 0 0 22px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.metric {
+    margin: 10px 0;
+    font-size: 15px;
+    color: #0f172a;
+    background: #f7f8fa;
+    border: 1px solid #cfd6e0;
+    border-radius: 10px;
+    padding: 11px 12px;
+}
+
+.owner-warning {
+    margin-top: 14px;
+    border-radius: 12px;
+    border: 2px solid #7f1d1d;
+    background: #fee2e2;
+    color: #7f1d1d;
+    padding: 14px;
+}
+
+.owner-warning h3 {
+    margin: 0 0 6px;
+    font-size: 17px;
+}
+
+.owner-warning p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.notify-card {
+    margin-top: 14px;
+    border-radius: 12px;
+    border: 2px solid #334155;
+    background: #e2e8f0;
+    color: #0f172a;
+    padding: 12px 14px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.notify-card.success {
+    border-color: #166534;
+    background: #dcfce7;
+    color: #14532d;
+}
+
+.notify-card.error {
+    border-color: #7f1d1d;
+    background: #fee2e2;
+    color: #7f1d1d;
+}
+
+.notify-card.info {
+    border-color: #1e3a8a;
+    background: #dbeafe;
+    color: #1e3a8a;
 }
 
 button {
-    width:100%;
-    margin-top:15px;
-    padding:15px;
-    border:none;
-    border-radius:10px;
-    background:black;
-    color:white;
-    font-size:16px;
-    cursor:pointer;
+    width: 100%;
+    margin-top: 12px;
+    padding: 14px;
+    border-radius: 11px;
+    border: 2px solid var(--line);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s ease;
+}
+
+button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 1px 1px 0 #0b0f1a;
+}
+
+.btn-ghost {
+    background: #ffffff;
+    color: var(--ink);
+    box-shadow: 3px 3px 0 #111827;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: #f8fafc;
+    box-shadow: 3px 3px 0 #0b0f1a;
+}
+
+button:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 #0b0f1a;
+}
+
+.btn-primary:hover {
+    background: var(--primaryHover);
+}
+
+@media (max-width: 520px) {
+    .card {
+        padding: 24px;
+    }
+
+    .card h2 {
+        font-size: 24px;
+    }
 }
 </style>
 
@@ -44,14 +191,24 @@ button {
 
 <body>
 
+<div class="bg"></div>
+
 <div class="card">
     <h2>Developer Dashboard</h2>
+    <p class="subhead">Secure payout management for contract earnings</p>
 
-    <p id="wallet">Wallet: Not connected</p>
-    <p id="balance">Contract Balance: Loading...</p>
+    <p class="metric" id="wallet">Wallet: Not connected</p>
+    <p class="metric" id="balance">Contract Balance: Loading...</p>
 
-    <button onclick="connect()">Connect Wallet</button>
-    <button onclick="withdraw()">Withdraw Earnings</button>
+    <div class="owner-warning hidden" id="ownerWarningCard">
+        <h3>Owner Access Required</h3>
+        <p id="ownerWarningText">This wallet is not the contract owner and cannot withdraw earnings.</p>
+    </div>
+
+    <div class="notify-card hidden" id="notifyCard"></div>
+
+    <button class="btn-ghost" onclick="connect()">Connect Wallet</button>
+    <button class="btn-primary" id="withdrawButton" onclick="withdraw()" disabled>Withdraw Earnings</button>
 </div>
 
 <script>
@@ -60,21 +217,40 @@ const CONTRACT = "0x68AC2bf0461dFBCe0a1D7e0eBf0a1585BCEFFF9b";
 
 let provider;
 let signer;
+let selectedAccount = null;
+let isOwnerWallet = false;
+let notifyTimeoutId = null;
 
-async function connect() {
-
+function getMetaMaskProvider() {
     let eth = window.ethereum;
 
     if (window.ethereum && window.ethereum.providers) {
         eth = window.ethereum.providers.find(p => p.isMetaMask);
     }
 
+    return eth;
+}
+
+async function connect() {
+
+    const eth = getMetaMaskProvider();
+
     if (!eth || !eth.isMetaMask) {
-        alert("MetaMask required");
+        showNotification("MetaMask is required to use this dashboard.", "error");
         return;
     }
 
     try {
+        // Match pay.html behavior: force fresh account selection popup.
+        try {
+            await eth.request({
+                method: "wallet_revokePermissions",
+                params: [{ eth_accounts: {} }]
+            });
+        } catch (revokeError) {
+            // Ignore revoke failures and continue to permission request.
+        }
+
         await eth.request({
             method: "wallet_requestPermissions",
             params: [{ eth_accounts: {} }]
@@ -84,19 +260,81 @@ async function connect() {
             method: "eth_requestAccounts"
         });
 
-        provider = new ethers.providers.Web3Provider(eth);
-        signer = provider.getSigner();
+        if (!accounts || accounts.length === 0) {
+            showNotification("No MetaMask account selected.", "error");
+            return;
+        }
 
-        const address = accounts[0];
+        provider = new ethers.providers.Web3Provider(eth);
+        selectedAccount = accounts[0];
+        signer = provider.getSigner(selectedAccount);
 
         document.getElementById("wallet").innerText =
-            "Wallet: " + address;
+            "Wallet: " + selectedAccount;
 
+        await updateOwnerStatus();
         loadBalance();
+        showNotification("Wallet connected successfully.", "success");
 
     } catch (err) {
         console.log(err);
-        alert("Connection rejected");
+        showNotification("Connection request was rejected.", "error");
+    }
+}
+
+function showNotification(message, type) {
+    const notifyCard = document.getElementById("notifyCard");
+
+    notifyCard.classList.remove("hidden", "success", "error", "info");
+    notifyCard.classList.add(type || "info");
+    notifyCard.innerText = message;
+
+    if (notifyTimeoutId) {
+        clearTimeout(notifyTimeoutId);
+    }
+
+    notifyTimeoutId = setTimeout(() => {
+        notifyCard.classList.add("hidden");
+    }, 5000);
+}
+
+function setOwnerWarning(visible, message) {
+    const warningCard = document.getElementById("ownerWarningCard");
+    const warningText = document.getElementById("ownerWarningText");
+    const withdrawButton = document.getElementById("withdrawButton");
+
+    if (message) {
+        warningText.innerText = message;
+    }
+
+    warningCard.classList.toggle("hidden", !visible);
+    withdrawButton.disabled = visible || !selectedAccount;
+}
+
+async function updateOwnerStatus() {
+    if (!provider || !selectedAccount) {
+        isOwnerWallet = false;
+        setOwnerWarning(false);
+        return;
+    }
+
+    const abi = ["function owner() view returns (address)"];
+    const contract = new ethers.Contract(CONTRACT, abi, provider);
+
+    try {
+        const owner = await contract.owner();
+        isOwnerWallet = owner.toLowerCase() === selectedAccount.toLowerCase();
+
+        if (isOwnerWallet) {
+            setOwnerWarning(false);
+        } else {
+            setOwnerWarning(true, "Connected wallet is not the contract owner. Switch to the owner wallet to withdraw earnings.");
+            showNotification("Connected wallet is not the contract owner.", "error");
+        }
+    } catch (err) {
+        isOwnerWallet = false;
+        setOwnerWarning(true, "Unable to verify contract owner right now. Please reconnect and try again.");
+        showNotification("Could not verify owner status.", "error");
     }
 }
 
@@ -111,20 +349,32 @@ async function loadBalance() {
 
 async function withdraw() {
 
+    if (!signer || !selectedAccount) {
+        showNotification("Connect a wallet before withdrawing.", "info");
+        return;
+    }
+
+    if (!isOwnerWallet) {
+        setOwnerWarning(true, "Connected wallet is not the contract owner. Switch to the owner wallet to withdraw earnings.");
+        return;
+    }
+
     const abi = ["function withdraw() public"];
 
     const contract = new ethers.Contract(CONTRACT, abi, signer);
 
     try {
         const tx = await contract.withdraw();
+        showNotification("Withdrawal submitted. Waiting for confirmation...", "info");
         await tx.wait();
 
-        alert("Withdraw successful!");
+        showNotification("Withdraw successful.", "success");
 
         loadBalance();
 
     } catch (err) {
-        alert("Only the owner can withdraw!");
+        setOwnerWarning(true, "Withdrawal rejected. Confirm you are connected with the owner wallet.");
+        showNotification("Withdrawal failed or rejected.", "error");
     }
 }
 
