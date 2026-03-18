@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Confirm Purchase</title>
+<script src="ethers.min.js"></script>
+
+<style>
+/* 
+    ===== Run WEb ===== 
+python -m http.server 3000
+
+*/
+body {
+    margin:0;
+    overflow:hidden;
+    font-family: Arial, sans-serif;
+}
+
+/* ===== SCROLLING CITY BG ===== */
+
+.bg {
+    position:fixed;
+    width:200%;
+    height:100%;
+    background:url("city.jpg") repeat-x;
+    background-size:auto 100%;
+    animation: scrollCity 40s linear infinite;
+    filter: grayscale(100%);
+}
+
+@keyframes scrollCity {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+}
+
+/* ===== CENTER CARD ===== */
+
+.card {
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:360px;
+    padding:40px;
+    border-radius:20px;
+    background:#e0e0e0;
+    border:3px solid black;
+    box-shadow:5px 5px 0 black;
+    text-align:center;
+}
+
+/* ===== TITLE ===== */
+
+.card h2 {
+    margin-bottom:20px;
+    color:black;
+}
+
+/* ===== SUCCESS SCREEN ===== */
+
+.success {
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:360px;
+    padding:40px;
+    border-radius:20px;
+    background:#e0e0e0;
+    border:3px solid black;
+    box-shadow:5px 5px 0 black;
+    text-align:center;
+}
+
+/* ===== TEXT ===== */
+
+#details {
+    font-size:18px;
+    margin-bottom:20px;
+}
+
+/* ===== BUTTON ===== */
+
+button {
+    width:100%;
+    padding:15px;
+    background:white;
+    border:3px solid black;
+    border-radius:12px;
+    font-size:16px;
+    cursor:pointer;
+    box-shadow:3px 3px 0 black;
+    transition:0.1s;
+}
+
+button:hover {
+    transform:translate(2px,2px);
+    box-shadow:1px 1px 0 black;
+}
+
+</style>
+
+</head>
+
+<body>
+<div class="bg"></div>
+<div class="success" id="successScreen" style="display:none;">
+    <h2>Purchase Successful!</h2>
+    <p id="successText"></p>
+</div>
+<div class="card">
+    <h2>Confirm Purchase</h2>
+    <p id="details"></p>
+    <button onclick="pay()">Confirm Purchase</button>
+</div>
+
+<script>
+
+const CONTRACT = "0x741d70b46E5f4322503f88348d6927Fc1d9b332C";
+
+const params = new URLSearchParams(window.location.search);
+const eth = params.get("eth");
+const fragments = params.get("frag");
+
+document.getElementById("details").innerText =
+    `Buy ${fragments} Color Fragments for ${eth} ETH`;
+
+async function pay() {
+
+    if (!window.ethereum) {
+        alert("MetaMask not found!");
+        return;
+    }
+
+    await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+
+    const tx = {
+        to: CONTRACT,
+        value: ethers.utils.parseEther(eth)
+    };
+
+    const transaction = await signer.sendTransaction(tx);
+    await transaction.wait();
+
+    // SEND SUCCESS TO UNITY
+    fetch(`http://localhost:5000/paymentSuccess?amount=${fragments}`);
+
+    // SHOW SUCCESS SCREEN
+    showSuccess();
+}
+
+function showSuccess(){
+
+    document.querySelector(".card").style.display = "none";
+
+    document.getElementById("successScreen").style.display = "block";
+
+    document.getElementById("successText").innerText =
+        `${fragments} Color Fragments added to your account!`;
+
+    setTimeout(()=>{
+        window.close();
+    },5000);
+}
+
+</script>
+
+</body>
+</html>

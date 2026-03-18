@@ -6,10 +6,10 @@ public class MenuManager : MonoBehaviour
     public GameObject levelsPanel;
     public GameObject settingsPanel;
     public GameObject exitPanel;
+    public GameObject shopPanel;
 
     public void ShowLevels()
     {
-        landingPanel.SetActive(false);
         levelsPanel.SetActive(true);
     }
 
@@ -18,14 +18,19 @@ public class MenuManager : MonoBehaviour
         settingsPanel.SetActive(false);
         exitPanel.SetActive(false);
         levelsPanel.SetActive(false);
-        landingPanel.SetActive(true);
+        shopPanel.SetActive(false);
     }
 
     public void ShowSettings()
     { 
         settingsPanel.SetActive(true);
     }
-    
+
+    public void ShowShop()
+    {
+        shopPanel.SetActive(true);
+    }
+
     public void ShowExit()
     { 
         exitPanel.SetActive(true);
