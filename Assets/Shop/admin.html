@@ -107,33 +107,65 @@ body::before {
     line-height: 1.4;
 }
 
-.notify-card {
-    margin-top: 14px;
-    border-radius: 12px;
-    border: 2px solid #334155;
-    background: #e2e8f0;
-    color: #0f172a;
-    padding: 12px 14px;
-    font-size: 14px;
-    line-height: 1.4;
+.popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 15;
+    padding: 16px;
 }
 
-.notify-card.success {
-    border-color: #166534;
-    background: #dcfce7;
+.popup-overlay.hidden {
+    display: none;
+}
+
+.popup-card {
+    width: min(420px, calc(100vw - 32px));
+    border-radius: 16px;
+    border: 2px solid #166534;
+    background: #ecfdf3;
     color: #14532d;
+    padding: 24px;
+    box-shadow: 10px 10px 0 rgba(20, 83, 45, 0.35);
 }
 
-.notify-card.error {
-    border-color: #7f1d1d;
-    background: #fee2e2;
-    color: #7f1d1d;
-}
-
-.notify-card.info {
+.popup-card.info {
     border-color: #1e3a8a;
     background: #dbeafe;
     color: #1e3a8a;
+    box-shadow: 10px 10px 0 rgba(30, 58, 138, 0.28);
+}
+
+.popup-card.error {
+    border-color: #7f1d1d;
+    background: #fee2e2;
+    color: #7f1d1d;
+    box-shadow: 10px 10px 0 rgba(127, 29, 29, 0.28);
+}
+
+.popup-card.success {
+    border-color: #166534;
+    background: #ecfdf3;
+    color: #14532d;
+    box-shadow: 10px 10px 0 rgba(20, 83, 45, 0.35);
+}
+
+.popup-card h3 {
+    margin: 0 0 10px;
+    font-size: 24px;
+}
+
+.popup-card p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.popup-card .popup-action {
+    margin-top: 16px;
 }
 
 button {
@@ -205,10 +237,16 @@ button:hover {
         <p id="ownerWarningText">This wallet is not the contract owner and cannot withdraw earnings.</p>
     </div>
 
-    <div class="notify-card hidden" id="notifyCard"></div>
-
     <button class="btn-ghost" onclick="connect()">Connect Wallet</button>
     <button class="btn-primary" id="withdrawButton" onclick="withdraw()" disabled>Withdraw Earnings</button>
+</div>
+
+<div class="popup-overlay hidden" id="successPopup">
+    <div class="popup-card success" id="popupCard">
+        <h3 id="popupTitle">Transfer Successful</h3>
+        <p id="successPopupText">Earnings transfer confirmed on-chain.</p>
+        <button class="btn-primary popup-action" onclick="hideSuccessPopup()">Close</button>
+    </div>
 </div>
 
 <script>
@@ -219,7 +257,7 @@ let provider;
 let signer;
 let selectedAccount = null;
 let isOwnerWallet = false;
-let notifyTimeoutId = null;
+let hasWithdrawableBalance = false;
 
 function getMetaMaskProvider() {
     let eth = window.ethereum;
@@ -273,7 +311,7 @@ async function connect() {
             "Wallet: " + selectedAccount;
 
         await updateOwnerStatus();
-        loadBalance();
+        await loadBalance();
         showNotification("Wallet connected successfully.", "success");
 
     } catch (err) {
@@ -282,39 +320,54 @@ async function connect() {
     }
 }
 
+function updateWithdrawButtonState() {
+    const withdrawButton = document.getElementById("withdrawButton");
+    const canWithdraw = Boolean(selectedAccount) && isOwnerWallet && hasWithdrawableBalance;
+    withdrawButton.disabled = !canWithdraw;
+}
+
 function showNotification(message, type) {
-    const notifyCard = document.getElementById("notifyCard");
+    const title = type === "error"
+        ? "Action Failed"
+        : (type === "success" ? "Success" : "Notice");
 
-    notifyCard.classList.remove("hidden", "success", "error", "info");
-    notifyCard.classList.add(type || "info");
-    notifyCard.innerText = message;
+    showSuccessPopup(message, title, type || "info");
+}
 
-    if (notifyTimeoutId) {
-        clearTimeout(notifyTimeoutId);
-    }
+function showSuccessPopup(message, title, type) {
+    const successPopup = document.getElementById("successPopup");
+    const popupCard = document.getElementById("popupCard");
+    const popupTitle = document.getElementById("popupTitle");
+    const successPopupText = document.getElementById("successPopupText");
 
-    notifyTimeoutId = setTimeout(() => {
-        notifyCard.classList.add("hidden");
-    }, 5000);
+    popupCard.classList.remove("info", "error", "success");
+    popupCard.classList.add(type || "info");
+    popupTitle.innerText = title || "Notice";
+    successPopupText.innerText = message;
+    successPopup.classList.remove("hidden");
+}
+
+function hideSuccessPopup() {
+    document.getElementById("successPopup").classList.add("hidden");
 }
 
 function setOwnerWarning(visible, message) {
     const warningCard = document.getElementById("ownerWarningCard");
     const warningText = document.getElementById("ownerWarningText");
-    const withdrawButton = document.getElementById("withdrawButton");
 
     if (message) {
         warningText.innerText = message;
     }
 
     warningCard.classList.toggle("hidden", !visible);
-    withdrawButton.disabled = visible || !selectedAccount;
+    updateWithdrawButtonState();
 }
 
 async function updateOwnerStatus() {
     if (!provider || !selectedAccount) {
         isOwnerWallet = false;
         setOwnerWarning(false);
+        updateWithdrawButtonState();
         return;
     }
 
@@ -331,20 +384,38 @@ async function updateOwnerStatus() {
             setOwnerWarning(true, "Connected wallet is not the contract owner. Switch to the owner wallet to withdraw earnings.");
             showNotification("Connected wallet is not the contract owner.", "error");
         }
+
+        updateWithdrawButtonState();
     } catch (err) {
         isOwnerWallet = false;
         setOwnerWarning(true, "Unable to verify contract owner right now. Please reconnect and try again.");
         showNotification("Could not verify owner status.", "error");
+        updateWithdrawButtonState();
     }
 }
 
 
 async function loadBalance() {
 
-    const balance = await provider.getBalance(CONTRACT);
+    if (!provider) {
+        hasWithdrawableBalance = false;
+        updateWithdrawButtonState();
+        return;
+    }
 
-    document.getElementById("balance").innerText =
-        "Contract Balance: " + ethers.utils.formatEther(balance) + " ETH";
+    try {
+        const balance = await provider.getBalance(CONTRACT);
+        hasWithdrawableBalance = !balance.isZero();
+
+        document.getElementById("balance").innerText =
+            "Contract Balance: " + ethers.utils.formatEther(balance) + " ETH";
+    } catch (err) {
+        hasWithdrawableBalance = false;
+        document.getElementById("balance").innerText =
+            "Contract Balance: Unavailable";
+    }
+
+    updateWithdrawButtonState();
 }
 
 async function withdraw() {
@@ -368,9 +439,10 @@ async function withdraw() {
         showNotification("Withdrawal submitted. Waiting for confirmation...", "info");
         await tx.wait();
 
-        showNotification("Withdraw successful.", "success");
+        const displayHash = tx.hash ? `${tx.hash.slice(0, 10)}...${tx.hash.slice(-8)}` : "N/A";
+        showSuccessPopup(`Earnings transfer confirmed on-chain. Tx: ${displayHash}`, "Transfer Successful", "success");
 
-        loadBalance();
+        await loadBalance();
 
     } catch (err) {
         setOwnerWarning(true, "Withdrawal rejected. Confirm you are connected with the owner wallet.");
