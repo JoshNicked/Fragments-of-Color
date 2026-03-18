@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Developer Earnings</title>
+<script src="ethers.min.js"></script>
+
+<style>
+body {
+    margin:0;
+    font-family: Arial;
+    background:#111;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.card {
+    background:#e0e0e0;
+    color:black;
+    padding:40px;
+    border-radius:20px;
+    width:350px;
+    text-align:center;
+    border:3px solid black;
+    box-shadow:5px 5px 0 black;
+}
+
+button {
+    width:100%;
+    margin-top:15px;
+    padding:15px;
+    border:none;
+    border-radius:10px;
+    background:black;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+    <h2>Developer Dashboard</h2>
+
+    <p id="wallet">Wallet: Not connected</p>
+    <p id="balance">Contract Balance: Loading...</p>
+
+    <button onclick="connect()">Connect Wallet</button>
+    <button onclick="withdraw()">Withdraw Earnings</button>
+</div>
+
+<script>
+
+const CONTRACT = "0x68AC2bf0461dFBCe0a1D7e0eBf0a1585BCEFFF9b";
+
+let provider;
+let signer;
+
+async function connect() {
+
+    let eth = window.ethereum;
+
+    if (window.ethereum && window.ethereum.providers) {
+        eth = window.ethereum.providers.find(p => p.isMetaMask);
+    }
+
+    if (!eth || !eth.isMetaMask) {
+        alert("MetaMask required");
+        return;
+    }
+
+    try {
+        await eth.request({
+            method: "wallet_requestPermissions",
+            params: [{ eth_accounts: {} }]
+        });
+
+        const accounts = await eth.request({
+            method: "eth_requestAccounts"
+        });
+
+        provider = new ethers.providers.Web3Provider(eth);
+        signer = provider.getSigner();
+
+        const address = accounts[0];
+
+        document.getElementById("wallet").innerText =
+            "Wallet: " + address;
+
+        loadBalance();
+
+    } catch (err) {
+        console.log(err);
+        alert("Connection rejected");
+    }
+}
+
+
+async function loadBalance() {
+
+    const balance = await provider.getBalance(CONTRACT);
+
+    document.getElementById("balance").innerText =
+        "Contract Balance: " + ethers.utils.formatEther(balance) + " ETH";
+}
+
+async function withdraw() {
+
+    const abi = ["function withdraw() public"];
+
+    const contract = new ethers.Contract(CONTRACT, abi, signer);
+
+    try {
+        const tx = await contract.withdraw();
+        await tx.wait();
+
+        alert("Withdraw successful!");
+
+        loadBalance();
+
+    } catch (err) {
+        alert("Only the owner can withdraw!");
+    }
+}
+
+</script>
+
+</body>
+</html>

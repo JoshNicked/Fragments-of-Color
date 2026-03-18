@@ -56,6 +56,12 @@ body {
     color:black;
 }
 
+#accountStatus {
+    margin-bottom:14px;
+    font-size:14px;
+    color:#222;
+}
+
 /* ===== SUCCESS SCREEN ===== */
 
 .success {
@@ -111,12 +117,13 @@ button:hover {
 <div class="card">
     <h2>Confirm Purchase</h2>
     <p id="details"></p>
-    <button onclick="pay()">Confirm Purchase</button>
+    <p id="accountStatus">Step 1: Select your MetaMask account.</p>
+    <button id="purchaseButton" onclick="handlePurchaseClick()">Select MetaMask Account</button>
 </div>
 
 <script>
 
-const CONTRACT = "0x741d70b46E5f4322503f88348d6927Fc1d9b332C";
+const CONTRACT = "0x68AC2bf0461dFBCe0a1D7e0eBf0a1585BCEFFF9b";
 
 const params = new URLSearchParams(window.location.search);
 const eth = params.get("eth");
@@ -125,6 +132,41 @@ const fragments = params.get("frag");
 document.getElementById("details").innerText =
     `Buy ${fragments} Color Fragments for ${eth} ETH`;
 
+let selectedAccount = null;
+
+async function handlePurchaseClick() {
+    if (!selectedAccount) {
+        await selectAccount();
+        return;
+    }
+
+    await pay();
+}
+
+async function selectAccount() {
+
+    if (!window.ethereum) {
+        alert("MetaMask not found!");
+        return;
+    }
+
+    try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+        if (!accounts || accounts.length === 0) {
+            alert("No MetaMask account selected.");
+            return;
+        }
+
+        selectedAccount = accounts[0];
+        document.getElementById("accountStatus").innerText =
+            `Step 2: Ready to buy with ${shortAddress(selectedAccount)}.`;
+        document.getElementById("purchaseButton").innerText = "Buy Now";
+    } catch (error) {
+        alert("Account selection was cancelled or failed.");
+    }
+}
+
 async function pay() {
 
     if (!window.ethereum) {
@@ -132,10 +174,13 @@ async function pay() {
         return;
     }
 
-    await window.ethereum.request({ method: 'eth_requestAccounts' });
+    if (!selectedAccount) {
+        alert("Please select a MetaMask account first.");
+        return;
+    }
 
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
+    const signer = provider.getSigner(selectedAccount);
 
     const tx = {
         to: CONTRACT,
@@ -150,6 +195,10 @@ async function pay() {
 
     // SHOW SUCCESS SCREEN
     showSuccess();
+}
+
+function shortAddress(address) {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
 function showSuccess(){
