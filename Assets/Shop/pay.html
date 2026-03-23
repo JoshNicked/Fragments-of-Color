@@ -56,6 +56,12 @@ body {
     color:black;
 }
 
+#accountStatus {
+    margin-bottom:14px;
+    font-size:14px;
+    color:#222;
+}
+
 /* ===== SUCCESS SCREEN ===== */
 
 .success {
@@ -111,19 +117,79 @@ button:hover {
 <div class="card">
     <h2>Confirm Purchase</h2>
     <p id="details"></p>
-    <button onclick="pay()">Confirm Purchase</button>
+    <p id="accountStatus">MetaMask account not connected.</p>
+    <button id="purchaseButton" onclick="handlePurchaseClick()">Confirm Purchase</button>
 </div>
 
 <script>
 
-const CONTRACT = "0x741d70b46E5f4322503f88348d6927Fc1d9b332C";
+const CONTRACT = "0x68AC2bf0461dFBCe0a1D7e0eBf0a1585BCEFFF9b";
 
 const params = new URLSearchParams(window.location.search);
 const eth = params.get("eth");
 const fragments = params.get("frag");
+const callbackPort = params.get("cbPort") || "5001";
 
 document.getElementById("details").innerText =
     `Buy ${fragments} Color Fragments for ${eth} ETH`;
+
+let selectedAccount = null;
+
+async function handlePurchaseClick() {
+    selectedAccount = null;
+    document.getElementById("accountStatus").innerText =
+        "Waiting for MetaMask account selection...";
+
+    await selectAccount();
+
+    if (!selectedAccount) {
+        return;
+    }
+
+    await pay();
+}
+
+async function selectAccount() {
+
+    if (!window.ethereum) {
+        alert("MetaMask not found!");
+        return;
+    }
+
+    try {
+        // Force a fresh account connect flow so MetaMask asks every time.
+        try {
+            await window.ethereum.request({
+                method: 'wallet_revokePermissions',
+                params: [{ eth_accounts: {} }]
+            });
+        } catch (revokeError) {
+            // Ignore revoke failures and continue to permission request.
+        }
+
+        await window.ethereum.request({
+            method: 'wallet_requestPermissions',
+            params: [{ eth_accounts: {} }]
+        });
+
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+        if (!accounts || accounts.length === 0) {
+            alert("No MetaMask account selected.");
+            document.getElementById("accountStatus").innerText =
+                "MetaMask account not connected.";
+            return;
+        }
+
+        selectedAccount = accounts[0];
+        document.getElementById("accountStatus").innerText =
+            `Connected: ${shortAddress(selectedAccount)}. Processing purchase...`;
+    } catch (error) {
+        alert("Account selection was cancelled or failed.");
+        document.getElementById("accountStatus").innerText =
+            "MetaMask account not connected.";
+    }
+}
 
 async function pay() {
 
@@ -132,10 +198,13 @@ async function pay() {
         return;
     }
 
-    await window.ethereum.request({ method: 'eth_requestAccounts' });
+    if (!selectedAccount) {
+        alert("Please select a MetaMask account first.");
+        return;
+    }
 
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
+    const signer = provider.getSigner(selectedAccount);
 
     const tx = {
         to: CONTRACT,
@@ -146,10 +215,14 @@ async function pay() {
     await transaction.wait();
 
     // SEND SUCCESS TO UNITY
-    fetch(`http://localhost:5000/paymentSuccess?amount=${fragments}`);
+    fetch(`http://localhost:${callbackPort}/paymentSuccess?amount=${fragments}`);
 
     // SHOW SUCCESS SCREEN
     showSuccess();
+}
+
+function shortAddress(address) {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
 function showSuccess(){

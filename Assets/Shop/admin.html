@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Developer Earnings</title>
+<script src="ethers.min.js"></script>
+
+<style>
+:root {
+    --panel: #eceff3;
+    --ink: #131921;
+    --muted: #4f5b6b;
+    --line: #1f2937;
+    --primary: #1f2937;
+    --primaryHover: #111827;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    color: var(--ink);
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(13, 17, 23, 0.68), rgba(13, 17, 23, 0.55));
+    z-index: -1;
+    pointer-events: none;
+}
+
+.bg {
+    position: fixed;
+    inset: 0;
+    width: 200%;
+    background: url("city.jpg") repeat-x;
+    background-size: auto 100%;
+    filter: grayscale(100%);
+    animation: scrollCity 42s linear infinite;
+    z-index: -2;
+}
+
+@keyframes scrollCity {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+.card {
+    width: min(420px, calc(100vw - 32px));
+    box-sizing: border-box;
+    padding: 34px;
+    border-radius: 18px;
+    background: var(--panel);
+    border: 2px solid var(--line);
+    box-shadow: 10px 10px 0 rgba(10, 10, 10, 0.8);
+    text-align: left;
+}
+
+.hidden {
+    display: none;
+}
+
+.card h2 {
+    margin: 0 0 8px;
+    font-size: 28px;
+    letter-spacing: 0.4px;
+}
+
+.subhead {
+    margin: 0 0 22px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.metric {
+    margin: 10px 0;
+    font-size: 15px;
+    color: #0f172a;
+    background: #f7f8fa;
+    border: 1px solid #cfd6e0;
+    border-radius: 10px;
+    padding: 11px 12px;
+}
+
+.owner-warning {
+    margin-top: 14px;
+    border-radius: 12px;
+    border: 2px solid #7f1d1d;
+    background: #fee2e2;
+    color: #7f1d1d;
+    padding: 14px;
+}
+
+.owner-warning h3 {
+    margin: 0 0 6px;
+    font-size: 17px;
+}
+
+.owner-warning p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 15;
+    padding: 16px;
+}
+
+.popup-overlay.hidden {
+    display: none;
+}
+
+.popup-card {
+    width: min(420px, calc(100vw - 32px));
+    border-radius: 16px;
+    border: 2px solid #166534;
+    background: #ecfdf3;
+    color: #14532d;
+    padding: 24px;
+    box-shadow: 10px 10px 0 rgba(20, 83, 45, 0.35);
+}
+
+.popup-card.info {
+    border-color: #1e3a8a;
+    background: #dbeafe;
+    color: #1e3a8a;
+    box-shadow: 10px 10px 0 rgba(30, 58, 138, 0.28);
+}
+
+.popup-card.error {
+    border-color: #7f1d1d;
+    background: #fee2e2;
+    color: #7f1d1d;
+    box-shadow: 10px 10px 0 rgba(127, 29, 29, 0.28);
+}
+
+.popup-card.success {
+    border-color: #166534;
+    background: #ecfdf3;
+    color: #14532d;
+    box-shadow: 10px 10px 0 rgba(20, 83, 45, 0.35);
+}
+
+.popup-card h3 {
+    margin: 0 0 10px;
+    font-size: 24px;
+}
+
+.popup-card p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.popup-card .popup-action {
+    margin-top: 16px;
+}
+
+button {
+    width: 100%;
+    margin-top: 12px;
+    padding: 14px;
+    border-radius: 11px;
+    border: 2px solid var(--line);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s ease;
+}
+
+button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 1px 1px 0 #0b0f1a;
+}
+
+.btn-ghost {
+    background: #ffffff;
+    color: var(--ink);
+    box-shadow: 3px 3px 0 #111827;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: #f8fafc;
+    box-shadow: 3px 3px 0 #0b0f1a;
+}
+
+button:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 #0b0f1a;
+}
+
+.btn-primary:hover {
+    background: var(--primaryHover);
+}
+
+@media (max-width: 520px) {
+    .card {
+        padding: 24px;
+    }
+
+    .card h2 {
+        font-size: 24px;
+    }
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="bg"></div>
+
+<div class="card">
+    <h2>Developer Dashboard</h2>
+    <p class="subhead">Secure payout management for contract earnings</p>
+
+    <p class="metric" id="wallet">Wallet: Not connected</p>
+    <p class="metric" id="balance">Contract Balance: Loading...</p>
+
+    <div class="owner-warning hidden" id="ownerWarningCard">
+        <h3>Owner Access Required</h3>
+        <p id="ownerWarningText">This wallet is not the contract owner and cannot withdraw earnings.</p>
+    </div>
+
+    <button class="btn-ghost" onclick="connect()">Connect Wallet</button>
+    <button class="btn-primary" id="withdrawButton" onclick="withdraw()" disabled>Withdraw Earnings</button>
+</div>
+
+<div class="popup-overlay hidden" id="successPopup">
+    <div class="popup-card success" id="popupCard">
+        <h3 id="popupTitle">Transfer Successful</h3>
+        <p id="successPopupText">Earnings transfer confirmed on-chain.</p>
+        <button class="btn-primary popup-action" onclick="hideSuccessPopup()">Close</button>
+    </div>
+</div>
+
+<script>
+
+const CONTRACT = "0x68AC2bf0461dFBCe0a1D7e0eBf0a1585BCEFFF9b";
+
+let provider;
+let signer;
+let selectedAccount = null;
+let isOwnerWallet = false;
+let hasWithdrawableBalance = false;
+
+function getMetaMaskProvider() {
+    let eth = window.ethereum;
+
+    if (window.ethereum && window.ethereum.providers) {
+        eth = window.ethereum.providers.find(p => p.isMetaMask);
+    }
+
+    return eth;
+}
+
+async function connect() {
+
+    const eth = getMetaMaskProvider();
+
+    if (!eth || !eth.isMetaMask) {
+        showNotification("MetaMask is required to use this dashboard.", "error");
+        return;
+    }
+
+    try {
+        // Match pay.html behavior: force fresh account selection popup.
+        try {
+            await eth.request({
+                method: "wallet_revokePermissions",
+                params: [{ eth_accounts: {} }]
+            });
+        } catch (revokeError) {
+            // Ignore revoke failures and continue to permission request.
+        }
+
+        await eth.request({
+            method: "wallet_requestPermissions",
+            params: [{ eth_accounts: {} }]
+        });
+
+        const accounts = await eth.request({
+            method: "eth_requestAccounts"
+        });
+
+        if (!accounts || accounts.length === 0) {
+            showNotification("No MetaMask account selected.", "error");
+            return;
+        }
+
+        provider = new ethers.providers.Web3Provider(eth);
+        selectedAccount = accounts[0];
+        signer = provider.getSigner(selectedAccount);
+
+        document.getElementById("wallet").innerText =
+            "Wallet: " + selectedAccount;
+
+        await updateOwnerStatus();
+        await loadBalance();
+        showNotification("Wallet connected successfully.", "success");
+
+    } catch (err) {
+        console.log(err);
+        showNotification("Connection request was rejected.", "error");
+    }
+}
+
+function updateWithdrawButtonState() {
+    const withdrawButton = document.getElementById("withdrawButton");
+    const canWithdraw = Boolean(selectedAccount) && isOwnerWallet && hasWithdrawableBalance;
+    withdrawButton.disabled = !canWithdraw;
+}
+
+function showNotification(message, type) {
+    const title = type === "error"
+        ? "Action Failed"
+        : (type === "success" ? "Success" : "Notice");
+
+    showSuccessPopup(message, title, type || "info");
+}
+
+function showSuccessPopup(message, title, type) {
+    const successPopup = document.getElementById("successPopup");
+    const popupCard = document.getElementById("popupCard");
+    const popupTitle = document.getElementById("popupTitle");
+    const successPopupText = document.getElementById("successPopupText");
+
+    popupCard.classList.remove("info", "error", "success");
+    popupCard.classList.add(type || "info");
+    popupTitle.innerText = title || "Notice";
+    successPopupText.innerText = message;
+    successPopup.classList.remove("hidden");
+}
+
+function hideSuccessPopup() {
+    document.getElementById("successPopup").classList.add("hidden");
+}
+
+function setOwnerWarning(visible, message) {
+    const warningCard = document.getElementById("ownerWarningCard");
+    const warningText = document.getElementById("ownerWarningText");
+
+    if (message) {
+        warningText.innerText = message;
+    }
+
+    warningCard.classList.toggle("hidden", !visible);
+    updateWithdrawButtonState();
+}
+
+async function updateOwnerStatus() {
+    if (!provider || !selectedAccount) {
+        isOwnerWallet = false;
+        setOwnerWarning(false);
+        updateWithdrawButtonState();
+        return;
+    }
+
+    const abi = ["function owner() view returns (address)"];
+    const contract = new ethers.Contract(CONTRACT, abi, provider);
+
+    try {
+        const owner = await contract.owner();
+        isOwnerWallet = owner.toLowerCase() === selectedAccount.toLowerCase();
+
+        if (isOwnerWallet) {
+            setOwnerWarning(false);
+        } else {
+            setOwnerWarning(true, "Connected wallet is not the contract owner. Switch to the owner wallet to withdraw earnings.");
+            showNotification("Connected wallet is not the contract owner.", "error");
+        }
+
+        updateWithdrawButtonState();
+    } catch (err) {
+        isOwnerWallet = false;
+        setOwnerWarning(true, "Unable to verify contract owner right now. Please reconnect and try again.");
+        showNotification("Could not verify owner status.", "error");
+        updateWithdrawButtonState();
+    }
+}
+
+
+async function loadBalance() {
+
+    if (!provider) {
+        hasWithdrawableBalance = false;
+        updateWithdrawButtonState();
+        return;
+    }
+
+    try {
+        const balance = await provider.getBalance(CONTRACT);
+        hasWithdrawableBalance = !balance.isZero();
+
+        document.getElementById("balance").innerText =
+            "Contract Balance: " + ethers.utils.formatEther(balance) + " ETH";
+    } catch (err) {
+        hasWithdrawableBalance = false;
+        document.getElementById("balance").innerText =
+            "Contract Balance: Unavailable";
+    }
+
+    updateWithdrawButtonState();
+}
+
+async function withdraw() {
+
+    if (!signer || !selectedAccount) {
+        showNotification("Connect a wallet before withdrawing.", "info");
+        return;
+    }
+
+    if (!isOwnerWallet) {
+        setOwnerWarning(true, "Connected wallet is not the contract owner. Switch to the owner wallet to withdraw earnings.");
+        return;
+    }
+
+    const abi = ["function withdraw() public"];
+
+    const contract = new ethers.Contract(CONTRACT, abi, signer);
+
+    try {
+        const tx = await contract.withdraw();
+        showNotification("Withdrawal submitted. Waiting for confirmation...", "info");
+        await tx.wait();
+
+        const displayHash = tx.hash ? `${tx.hash.slice(0, 10)}...${tx.hash.slice(-8)}` : "N/A";
+        showSuccessPopup(`Earnings transfer confirmed on-chain. Tx: ${displayHash}`, "Transfer Successful", "success");
+
+        await loadBalance();
+
+    } catch (err) {
+        setOwnerWarning(true, "Withdrawal rejected. Confirm you are connected with the owner wallet.");
+        showNotification("Withdrawal failed or rejected.", "error");
+    }
+}
+
+</script>
+
+</body>
+</html>
