@@ -6,7 +6,7 @@ using System.Collections;
 public class GameTimer : MonoBehaviour
 {
     [Header("Timer Settings")]
-    public float timeRemaining = 60f;
+    public float timeRemaining = 5f;
     public bool timerIsRunning = true;
     public bool isGameOver = false;
 
@@ -23,7 +23,6 @@ public class GameTimer : MonoBehaviour
 
     void Start()
     {
-        // ✅ ALWAYS RESET TIME
         Time.timeScale = 1f;
 
         timerIsRunning = true;
@@ -40,14 +39,12 @@ public class GameTimer : MonoBehaviour
 
     void Update()
     {
-        // ✅ Stop timer when paused
-        if (Time.timeScale == 0f) return;
-
         if (timerIsRunning)
         {
             if (timeRemaining > 0)
             {
-                timeRemaining -= Time.deltaTime;
+                // ✅ Timer runs even when paused
+                timeRemaining -= Time.unscaledDeltaTime;
                 DisplayTime(timeRemaining);
             }
             else
@@ -55,6 +52,13 @@ public class GameTimer : MonoBehaviour
                 timeRemaining = 0;
                 timerIsRunning = false;
                 isGameOver = true;
+
+                // ✅ FORCE CLOSE MENU + UNPAUSE
+                MenuManage menu = FindObjectOfType<MenuManage>();
+                if (menu != null)
+                    menu.ForceCloseMenu();
+
+                Time.timeScale = 1f;
 
                 StartCoroutine(FadeInGameOver());
             }
@@ -95,13 +99,13 @@ public class GameTimer : MonoBehaviour
 
     public void RetryGame()
     {
-        Time.timeScale = 1f; // 🔥 FIX FREEZE
+        Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void QuitGame(string sceneName)
     {
-        Time.timeScale = 1f; // 🔥 FIX FREEZE
+        Time.timeScale = 1f;
         SceneManager.LoadScene(sceneName);
     }
 }
