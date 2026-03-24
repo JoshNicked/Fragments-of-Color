@@ -21,6 +21,10 @@ public class BoxInteraction : MonoBehaviour
     private Rigidbody boxRigidbody;
     private BoxCollider boxCollider;
 
+    // --- Toggle state ---
+    private bool isInteracting = false;
+    private Rigidbody lockedBoxRigidbody; // keeps reference while toggled on
+
     void Start()
     {
         if (interactPrompt != null)
@@ -39,17 +43,20 @@ public class BoxInteraction : MonoBehaviour
     void Update()
     {
         CheckForBox();
+        HandleToggleInput();
     }
 
     void FixedUpdate()
     {
-        if (boxRigidbody != null &&
-            Input.GetKey(interactKey) &&
-            !playerMotor.isInteractingWithChest)
+        // Use the locked reference while interacting, not the live raycast one
+        bool canInteract = lockedBoxRigidbody != null
+                           && isInteracting
+                           && !playerMotor.isInteractingWithChest;
+
+        if (canInteract)
         {
             isRotationLocked = true;
-            boxRigidbody.isKinematic = false;
-
+            lockedBoxRigidbody.isKinematic = false;
             MoveBoxWithPlayer();
             LockPlayerRotationTowardBox();
         }
@@ -57,11 +64,46 @@ public class BoxInteraction : MonoBehaviour
         {
             isRotationLocked = false;
 
-            if (boxRigidbody != null)
-                boxRigidbody.isKinematic = true;
+            if (lockedBoxRigidbody != null)
+                lockedBoxRigidbody.isKinematic = true;
         }
     }
 
+    // -------------------------------------------------------
+    //  Toggle logic
+    // -------------------------------------------------------
+    void HandleToggleInput()
+    {
+        if (!Input.GetKeyDown(interactKey)) return;
+
+        if (!isInteracting)
+        {
+            // Only start if the player is actually looking at a box right now
+            if (boxRigidbody != null && !playerMotor.isInteractingWithChest)
+            {
+                isInteracting = true;
+                lockedBoxRigidbody = boxRigidbody; // lock onto this box
+            }
+        }
+        else
+        {
+            StopInteracting();
+        }
+    }
+
+    void StopInteracting()
+    {
+        isInteracting = false;
+
+        if (lockedBoxRigidbody != null)
+            lockedBoxRigidbody.isKinematic = true;
+
+        lockedBoxRigidbody = null;
+    }
+
+    // -------------------------------------------------------
+    //  Existing helpers (unchanged except boxRigidbody → lockedBoxRigidbody)
+    // -------------------------------------------------------
     void MoveBoxWithPlayer()
     {
         Vector3 moveInput = new Vector3(
@@ -79,14 +121,17 @@ public class BoxInteraction : MonoBehaviour
         moveDir.Normalize();
 
         Vector3 targetPos =
-            boxRigidbody.position +
+            lockedBoxRigidbody.position +
             moveDir * pushPullSpeed * Time.fixedDeltaTime;
 
-        boxRigidbody.MovePosition(targetPos);
+        lockedBoxRigidbody.MovePosition(targetPos);
     }
 
     void CheckForBox()
     {
+        // While already locked on, skip raycasting so the reference isn't wiped
+        if (isInteracting) return;
+
         Ray ray = new Ray(playerTransform.position + Vector3.up * 0.5f, playerTransform.forward);
         RaycastHit hit;
 
@@ -96,7 +141,6 @@ public class BoxInteraction : MonoBehaviour
                 interactPrompt.SetActive(true);
 
             Rigidbody rb = hit.collider.GetComponent<Rigidbody>();
-
             if (rb != null)
                 boxRigidbody = rb;
         }
@@ -105,17 +149,16 @@ public class BoxInteraction : MonoBehaviour
             if (interactPrompt != null)
                 interactPrompt.SetActive(false);
 
-            boxRigidbody = null; // 🔥 THIS IS THE FIX
+            boxRigidbody = null;
         }
     }
 
     void LockPlayerRotationTowardBox()
     {
-        if (boxRigidbody == null) return;
+        if (lockedBoxRigidbody == null) return;
 
         Vector3 lookDir =
-            (boxRigidbody.position - playerTransform.position).normalized;
-
+            (lockedBoxRigidbody.position - playerTransform.position).normalized;
         lookDir.y = 0;
 
         playerTransform.rotation =
