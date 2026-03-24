@@ -12087,7 +12087,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 67445218}
-  sensitivity: 120
+  sensitivity: 20
   distance: 0
   minDistance: 2
   maxDistance: 2

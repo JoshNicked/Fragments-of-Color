@@ -35,9 +35,6 @@ public class BoxInteraction : MonoBehaviour
 
         if (boxRigidbody != null)
             boxRigidbody.isKinematic = true;
-
-        if (boxCollider != null)
-            boxCollider.isTrigger = true;
     }
 
     void Update()
