@@ -6,7 +6,7 @@ using System.Collections;
 public class GameTimer : MonoBehaviour
 {
     [Header("Timer Settings")]
-    public float timeRemaining = 5f;
+    public float timeRemaining = 60f;
     public bool timerIsRunning = true;
     public bool isGameOver = false;
 
@@ -28,6 +28,9 @@ public class GameTimer : MonoBehaviour
         timerIsRunning = true;
         isGameOver = false;
 
+        foreach (var obj in objectsToStop)
+            if (obj != null) obj.enabled = true;
+
         gameOverPanel.SetActive(true);
         gameOverCanvasGroup.alpha = 0f;
         gameOverCanvasGroup.interactable = false;
@@ -43,17 +46,18 @@ public class GameTimer : MonoBehaviour
         {
             if (timeRemaining > 0)
             {
-                // ✅ Timer runs even when paused
+                // Timer runs even if game is paused/menu open
                 timeRemaining -= Time.unscaledDeltaTime;
                 DisplayTime(timeRemaining);
             }
             else
             {
+                // Time's up → Game Over
                 timeRemaining = 0;
                 timerIsRunning = false;
                 isGameOver = true;
 
-                // ✅ FORCE CLOSE MENU + UNPAUSE
+                // Force close menu if open
                 MenuManage menu = FindObjectOfType<MenuManage>();
                 if (menu != null)
                     menu.ForceCloseMenu();
@@ -77,15 +81,13 @@ public class GameTimer : MonoBehaviour
 
     IEnumerator FadeInGameOver()
     {
-        // Stop gameplay scripts
         foreach (var obj in objectsToStop)
-            obj.enabled = false;
+            if (obj != null) obj.enabled = false;
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
         float elapsed = 0f;
-
         while (elapsed < fadeDuration)
         {
             elapsed += Time.unscaledDeltaTime;
@@ -97,15 +99,27 @@ public class GameTimer : MonoBehaviour
         gameOverCanvasGroup.blocksRaycasts = true;
     }
 
+    // ✅ Retry current level
     public void RetryGame()
     {
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    public void QuitGame(string sceneName)
+    // ✅ ONE EXIT FUNCTION for menu & game over
+    public void ExitToMenu(string sceneName)
     {
         Time.timeScale = 1f;
+
+        // Reset timer & game over
+        timerIsRunning = false;
+        isGameOver = false;
+
+        // Re-enable all gameplay objects in case menu persists
+        foreach (var obj in objectsToStop)
+            if (obj != null) obj.enabled = true;
+
+        // Load menu scene
         SceneManager.LoadScene(sceneName);
     }
 }
