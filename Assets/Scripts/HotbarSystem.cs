@@ -23,13 +23,13 @@ public class HotbarSystem : MonoBehaviour
 
     private int currentIndex = -1;
     private GameObject equippedObject;
-
     private int IsEquippedHash;
 
     void Start()
     {
         IsEquippedHash = Animator.StringToHash("IsEquipped");
 
+        // Clear UI
         for (int i = 0; i < slotImages.Length; i++)
         {
             if (slotImages[i] != null)
@@ -52,14 +52,19 @@ public class HotbarSystem : MonoBehaviour
 
     public bool AddItem(Sprite icon, GameObject prefab)
     {
+        if (prefab == null)
+        {
+            Debug.LogError("[Hotbar] Prefab is NULL!");
+            return false;
+        }
+
         for (int i = 0; i < items.Length; i++)
         {
             if (items[i] == null || items[i].prefab == null)
             {
-                items[i] = new HotbarItem();
-                items[i].icon = icon;
-                items[i].prefab = prefab;
+                items[i] = new HotbarItem { icon = icon, prefab = prefab };
 
+                // Update UI
                 if (i < slotImages.Length && slotImages[i] != null)
                 {
                     slotImages[i].sprite = icon;
@@ -67,23 +72,26 @@ public class HotbarSystem : MonoBehaviour
                     slotImages[i].color = Color.white;
                 }
 
+                Debug.Log($"[Hotbar] Added '{prefab.name}' to slot {i}");
                 return true;
             }
         }
 
-        Debug.Log("Hotbar Full!");
+        Debug.Log("[Hotbar] Hotbar full!");
         return false;
     }
 
     void SelectSlot(int index)
     {
+        if (index < 0 || index >= items.Length)
+            return;
+
         if (items[index] == null || items[index].prefab == null)
         {
-            Debug.Log("Slot Empty");
+            Debug.Log("[Hotbar] Slot empty.");
             return;
         }
 
-        // Toggle same slot
         if (currentIndex == index)
         {
             StartCoroutine(UnequipRoutine());
@@ -100,32 +108,42 @@ public class HotbarSystem : MonoBehaviour
 
     IEnumerator EquipRoutine(GameObject prefab)
     {
-        // Remove old object
-        if (equippedObject != null)
-        {
-            Destroy(equippedObject);
-            equippedObject = null;
-        }
+        if (prefab == null) yield break;
 
-        // Play equip animation
+        // Remove previous
+        if (equippedObject != null)
+            Destroy(equippedObject);
+
         if (playerAnimator != null)
             playerAnimator.SetBool(IsEquippedHash, true);
 
-        // Small delay to sync with animation
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.1f);
 
-        equippedObject = Instantiate(prefab, handPoint);
+        // Instantiate
+        equippedObject = Instantiate(prefab, handPoint.position, handPoint.rotation, handPoint);
+
+        // Reset local transform
         equippedObject.transform.localPosition = Vector3.zero;
         equippedObject.transform.localRotation = Quaternion.identity;
+        equippedObject.transform.localScale = Vector3.one * 0.3f;
+
+        // Enable MeshRenderers
+        foreach (Renderer r in equippedObject.GetComponentsInChildren<Renderer>())
+            r.enabled = true;
+
+        // Enable SpriteRenderers
+        foreach (SpriteRenderer sr in equippedObject.GetComponentsInChildren<SpriteRenderer>())
+            sr.enabled = true;
+
+        Debug.Log($"[Hotbar] Equipped '{prefab.name}'");
     }
 
     IEnumerator UnequipRoutine()
     {
-        // Play unequip animation
         if (playerAnimator != null)
             playerAnimator.SetBool(IsEquippedHash, false);
 
-        yield return new WaitForSeconds(0.15f);
+        yield return new WaitForSeconds(0.1f);
 
         if (equippedObject != null)
         {

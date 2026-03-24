@@ -11,13 +11,16 @@ public class ChestInteraction : MonoBehaviour
     private PlayerMotor playerMotor;
 
     public Transform player;
-    public float pickupDistance = 2f;
+    public float pickupDistance = 4f;
 
     [Header("Fragment Settings")]
-    public GameObject fragment;
+    public FragmentData fragmentData;   // Assign ScriptableObject
     public Transform snapPoint;
     public float floatHeight = 0.5f;
     public float floatSpeed = 1f;
+
+    private GameObject fragmentInstance;
+    private bool hasGivenItem = false;
 
     void Start()
     {
@@ -25,8 +28,13 @@ public class ChestInteraction : MonoBehaviour
         animator = GetComponent<Animator>();
         playerMotor = player.GetComponent<PlayerMotor>();
 
-        if (fragment)
-            fragment.SetActive(false);
+        // Spawn fragment but keep hidden
+        if (fragmentData != null && fragmentData.prefab != null)
+        {
+            fragmentInstance = Instantiate(fragmentData.prefab, snapPoint.position, Quaternion.identity);
+            fragmentInstance.transform.parent = snapPoint;
+            fragmentInstance.SetActive(false);
+        }
     }
 
     void Update()
@@ -34,82 +42,72 @@ public class ChestInteraction : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F) && !isAnimating)
         {
             float distance = Vector3.Distance(player.position, transform.position);
-
             if (distance <= pickupDistance)
             {
                 playerMotor.isInteractingWithChest = true;
-
-                if (isOpen)
-                    StartCoroutine(CloseChest());
-                else
-                    StartCoroutine(OpenChest());
+                StartCoroutine(isOpen ? CloseChest() : OpenChest());
             }
         }
 
-        // Floating fragment
-        if (fragment && fragment.activeSelf)
+        // Floating effect
+        if (fragmentInstance != null && fragmentInstance.activeSelf)
         {
             float yOffset = Mathf.Sin(Time.time * floatSpeed) * 0.2f;
-            fragment.transform.localPosition =
-                snapPoint.localPosition + Vector3.up * (floatHeight + yOffset);
+            fragmentInstance.transform.localPosition = Vector3.up * (floatHeight + yOffset);
         }
 
-        // Pick up fragment with E
-        if (fragment && fragment.activeSelf && Input.GetKeyDown(KeyCode.E))
+        // Pickup fragment
+        if (fragmentInstance != null && fragmentInstance.activeSelf && Input.GetKeyDown(KeyCode.E))
         {
-            if (Vector3.Distance(player.position, fragment.transform.position) <= pickupDistance)
+            float distance = Vector3.Distance(player.position, fragmentInstance.transform.position);
+            if (distance <= pickupDistance && !hasGivenItem)
             {
-                FragmentData data = fragment.GetComponent<FragmentData>();
-
-                if (data != null)
+                bool added = hotbar.AddItem(fragmentData.icon, fragmentData.prefab);
+                if (added)
                 {
-                    bool added = hotbar.AddItem(data.icon, data.prefab);
-
-                    if (added)
-                        fragment.SetActive(false);
+                    fragmentInstance.SetActive(false);
+                    hasGivenItem = true;
+                    Debug.Log($"[Chest] Picked up '{fragmentData.prefab.name}'");
                 }
             }
         }
     }
 
-    private IEnumerator OpenChest()
+    IEnumerator OpenChest()
     {
         isAnimating = true;
         animator.SetBool("isOpen", true);
-
         yield return new WaitForSeconds(GetAnimationLength("Open"));
 
-        if (fragment)
-            fragment.SetActive(true);
+        if (!hasGivenItem && fragmentInstance != null)
+            fragmentInstance.SetActive(true);
 
         isOpen = true;
         isAnimating = false;
         playerMotor.isInteractingWithChest = false;
     }
 
-    private IEnumerator CloseChest()
+    IEnumerator CloseChest()
     {
         isAnimating = true;
         animator.SetBool("isOpen", false);
-
         yield return new WaitForSeconds(GetAnimationLength("Close"));
 
-        if (fragment)
-            fragment.SetActive(false);
+        if (fragmentInstance != null)
+            fragmentInstance.SetActive(false);
 
         isOpen = false;
         isAnimating = false;
         playerMotor.isInteractingWithChest = false;
     }
 
-    private float GetAnimationLength(string clipName)
+    float GetAnimationLength(string clipName)
     {
         foreach (AnimationClip clip in animator.runtimeAnimatorController.animationClips)
         {
             if (clip.name == clipName)
                 return clip.length;
         }
-
         return 0.5f;
     }
 }
