@@ -13,7 +13,6 @@ public class MenuManage : MonoBehaviour
 
     void Start()
     {
-        // ✅ ALWAYS RESET TIME
         Time.timeScale = 1f;
 
         pauseMenu.SetActive(false);
@@ -26,13 +25,12 @@ public class MenuManage : MonoBehaviour
 
     void Update()
     {
-        // ❌ Don't allow pause if game over
+        // ❌ Disable menu if game is over
         if (gameTimer != null && gameTimer.isGameOver)
             return;
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            // If inside shop/options → go back to pause menu
             if (shopPanel.activeSelf || optionsPanel.activeSelf)
             {
                 BackToMenu();
@@ -96,17 +94,30 @@ public class MenuManage : MonoBehaviour
         pauseMenu.SetActive(true);
     }
 
-    // ✅ QUIT GAME (BUILD)
+    // ✅ IMPORTANT: CALLED BY GAME TIMER
+    public void ForceCloseMenu()
+    {
+        isPaused = false;
+
+        pauseMenu.SetActive(false);
+        shopPanel.SetActive(false);
+        optionsPanel.SetActive(false);
+
+        Time.timeScale = 1f;
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
     public void QuitGame()
     {
-        Time.timeScale = 1f; // 🔥 VERY IMPORTANT
+        Time.timeScale = 1f;
         Application.Quit();
     }
 
-    // ✅ QUIT TO MAIN MENU SCENE
     public void QuitToMenu(string sceneName)
     {
-        Time.timeScale = 1f; // 🔥 VERY IMPORTANT
+        Time.timeScale = 1f;
         SceneManager.LoadScene(sceneName);
     }
 }
