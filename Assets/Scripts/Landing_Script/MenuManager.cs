@@ -7,6 +7,7 @@ public class MenuManager : MonoBehaviour
     public GameObject settingsPanel;
     public GameObject exitPanel;
     public GameObject shopPanel;
+    public GameObject exitGame;
 
     public void ShowLevels()
     {
@@ -35,5 +36,11 @@ public class MenuManager : MonoBehaviour
     { 
         exitPanel.SetActive(true);
     }
-    
+
+    public void QuitGame()
+    {
+        Debug.Log("Game is exiting...");
+        Application.Quit();
+    }
+
 }
