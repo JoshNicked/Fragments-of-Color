@@ -35,6 +35,16 @@ public class BoxInteraction : MonoBehaviour
 
         if (boxRigidbody != null)
             boxRigidbody.isKinematic = true;
+
+        // Try to auto-assign player references if not set in inspector
+        if (playerMotor == null)
+            playerMotor = Object.FindFirstObjectByType<PlayerMotor>();
+
+        if (playerTransform == null && playerMotor != null)
+            playerTransform = playerMotor.transform;
+
+        if (playerMotor == null || playerTransform == null)
+            Debug.LogWarning("BoxInteraction: playerMotor or playerTransform not assigned. Assign in inspector or ensure a PlayerMotor exists in scene.");
     }
 
     void Update()
@@ -46,14 +56,21 @@ public class BoxInteraction : MonoBehaviour
     void FixedUpdate()
     {
         // Use the locked reference while interacting, not the live raycast one
-        bool canInteract = lockedBoxRigidbody != null
-                           && isInteracting
-                           && !playerMotor.isInteractingWithChest;
+        bool canInteract;
+        if (playerMotor != null)
+            canInteract = lockedBoxRigidbody != null && isInteracting && !playerMotor.isInteractingWithChest;
+        else
+            canInteract = lockedBoxRigidbody != null && isInteracting;
 
         if (canInteract)
         {
             isRotationLocked = true;
+
+            // enable physics movement and better collision detection while interacting
             lockedBoxRigidbody.isKinematic = false;
+            lockedBoxRigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            lockedBoxRigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+
             MoveBoxWithPlayer();
             LockPlayerRotationTowardBox();
         }
@@ -62,7 +79,12 @@ public class BoxInteraction : MonoBehaviour
             isRotationLocked = false;
 
             if (lockedBoxRigidbody != null)
+            {
+                // revert to kinematic when not interacting so other physics don't move it
                 lockedBoxRigidbody.isKinematic = true;
+                lockedBoxRigidbody.collisionDetectionMode = CollisionDetectionMode.Discrete;
+                lockedBoxRigidbody.interpolation = RigidbodyInterpolation.None;
+            }
         }
     }
 
@@ -76,10 +98,14 @@ public class BoxInteraction : MonoBehaviour
         if (!isInteracting)
         {
             // Only start if the player is actually looking at a box right now
-            if (boxRigidbody != null && !playerMotor.isInteractingWithChest)
+            if (boxRigidbody != null && (playerMotor == null || !playerMotor.isInteractingWithChest))
             {
                 isInteracting = true;
                 lockedBoxRigidbody = boxRigidbody; // lock onto this box
+
+                // cache collider if missing
+                if (boxCollider == null && lockedBoxRigidbody != null)
+                    boxCollider = lockedBoxRigidbody.GetComponent<BoxCollider>();
             }
         }
         else
@@ -103,6 +129,8 @@ public class BoxInteraction : MonoBehaviour
     // -------------------------------------------------------
     void MoveBoxWithPlayer()
     {
+        if (playerTransform == null || lockedBoxRigidbody == null) return;
+
         Vector3 moveInput = new Vector3(
             Input.GetAxis("Horizontal"),
             0,
@@ -117,17 +145,46 @@ public class BoxInteraction : MonoBehaviour
 
         moveDir.Normalize();
 
-        Vector3 targetPos =
-            lockedBoxRigidbody.position +
-            moveDir * pushPullSpeed * Time.fixedDeltaTime;
+        // Calculate desired delta movement this physics step
+        Vector3 delta = moveDir * pushPullSpeed * Time.fixedDeltaTime;
+        float distance = delta.magnitude;
+        if (distance <= 0f) return;
 
-        lockedBoxRigidbody.MovePosition(targetPos);
+        // Perform a sweep test to check if moving the box in that direction would collide
+        RaycastHit hit;
+        bool hitSomething = false;
+
+        // Ensure we have a collider reference
+        if (boxCollider == null)
+            boxCollider = lockedBoxRigidbody.GetComponent<BoxCollider>();
+
+        // Use Rigidbody.SweepTest which approximates moving the collider and reports first hit
+        if (lockedBoxRigidbody.SweepTest(moveDir, out hit, distance))
+        {
+            hitSomething = true;
+        }
+
+        if (hitSomething)
+        {
+            // Move as far as possible without penetrating the hit surface
+            float safeDistance = Mathf.Max(0f, hit.distance - 0.01f);
+            Vector3 safePos = lockedBoxRigidbody.position + moveDir * safeDistance;
+            lockedBoxRigidbody.MovePosition(safePos);
+        }
+        else
+        {
+            // No obstacle, perform normal MovePosition
+            Vector3 targetPos = lockedBoxRigidbody.position + delta;
+            lockedBoxRigidbody.MovePosition(targetPos);
+        }
     }
 
     void CheckForBox()
     {
         // While already locked on, skip raycasting so the reference isn't wiped
         if (isInteracting) return;
+
+        if (playerTransform == null) return;
 
         Ray ray = new Ray(playerTransform.position + Vector3.up * 0.5f, playerTransform.forward);
         RaycastHit hit;
@@ -152,7 +209,7 @@ public class BoxInteraction : MonoBehaviour
 
     void LockPlayerRotationTowardBox()
     {
-        if (lockedBoxRigidbody == null) return;
+        if (lockedBoxRigidbody == null || playerTransform == null) return;
 
         Vector3 lookDir =
             (lockedBoxRigidbody.position - playerTransform.position).normalized;
