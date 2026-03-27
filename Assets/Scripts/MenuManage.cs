@@ -14,7 +14,6 @@ public class MenuManage : MonoBehaviour
     void Start()
     {
         Time.timeScale = 1f;
-
         pauseMenu.SetActive(false);
         shopPanel.SetActive(false);
         optionsPanel.SetActive(false);
@@ -25,20 +24,15 @@ public class MenuManage : MonoBehaviour
 
     void Update()
     {
-        // ❌ Disable menu if game is over
         if (gameTimer != null && gameTimer.isGameOver)
             return;
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (shopPanel.activeSelf || optionsPanel.activeSelf)
-            {
                 BackToMenu();
-            }
             else
-            {
                 TogglePause();
-            }
         }
     }
 
@@ -59,13 +53,10 @@ public class MenuManage : MonoBehaviour
     public void ResumeGame()
     {
         isPaused = false;
-
+        CloseAllSubMenus();
         pauseMenu.SetActive(false);
-        shopPanel.SetActive(false);
-        optionsPanel.SetActive(false);
 
         Time.timeScale = 1f;
-
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -94,30 +85,16 @@ public class MenuManage : MonoBehaviour
         pauseMenu.SetActive(true);
     }
 
-    // ✅ IMPORTANT: CALLED BY GAME TIMER
+    // Called by GameTimer when game over
     public void ForceCloseMenu()
     {
         isPaused = false;
-
+        CloseAllSubMenus();
         pauseMenu.SetActive(false);
-        shopPanel.SetActive(false);
-        optionsPanel.SetActive(false);
 
         Time.timeScale = 1f;
-
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
 
-    public void QuitGame()
-    {
-        Time.timeScale = 1f;
-        Application.Quit();
-    }
-
-    public void QuitToMenu(string sceneName)
-    {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(sceneName);
-    }
 }

@@ -136,20 +136,41 @@ public class PaymentListener : MonoBehaviour
             if (request.Url.AbsolutePath == "/paymentSuccess")
             {
                 string amountStr = request.QueryString["amount"];
-                Debug.Log($"PaymentListener payment callback received. Raw amount: {amountStr}");
+                string timeStr = request.QueryString["timeSeconds"];
+                Debug.Log($"PaymentListener payment callback received. amount={amountStr}, timeSeconds={timeStr}");
 
-                if (!string.IsNullOrEmpty(amountStr) && int.TryParse(amountStr, out int amount))
+                int fragmentAmount = 0;
+                int timeSeconds = 0;
+
+                if (!string.IsNullOrEmpty(timeStr) && int.TryParse(timeStr, out timeSeconds) && timeSeconds > 0)
                 {
-                    Debug.Log("PaymentListener payment parsed successfully. Amount: " + amount);
+                    int paymentAmount = 0;
+                    if (!string.IsNullOrEmpty(amountStr))
+                        int.TryParse(amountStr, out paymentAmount);
+
                     UnityMainThread.Execute(() =>
                     {
-                        CurrencyManager.Instance.AddFragments(amount);
-                        Debug.Log("Fragments Added: " + amount);
+                        if (ShopManager.Instance != null)
+                        {
+                            ShopManager.Instance.OnBlockchainTimePurchaseSuccess(timeSeconds, paymentAmount);
+                        }
+                        else
+                        {
+                            Debug.LogWarning("ShopManager not found for blockchain time purchase callback.");
+                        }
+                    });
+                }
+                else if (!string.IsNullOrEmpty(amountStr) && int.TryParse(amountStr, out fragmentAmount))
+                {
+                    UnityMainThread.Execute(() =>
+                    {
+                        CurrencyManager.Instance.AddFragments(fragmentAmount);
+                        Debug.Log("Fragments Added: " + fragmentAmount);
                     });
                 }
                 else
                 {
-                    Debug.LogWarning("PaymentListener payment callback had invalid or missing amount.");
+                    Debug.LogWarning("PaymentListener payment callback had invalid or missing amount/time.");
                 }
             }
 
