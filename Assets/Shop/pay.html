@@ -126,12 +126,19 @@ button:hover {
 const CONTRACT = "0x68AC2bf0461dFBCe0a1D7e0eBf0a1585BCEFFF9b";
 
 const params = new URLSearchParams(window.location.search);
+const type = params.get("type") || "fragments";
 const eth = params.get("eth");
 const fragments = params.get("frag");
+const seconds = params.get("seconds");
 const callbackPort = params.get("cbPort") || "5001";
 
-document.getElementById("details").innerText =
-    `Buy ${fragments} Color Fragments for ${eth} ETH`;
+if (type === "time") {
+    document.getElementById("details").innerText =
+        `Buy +${seconds}s Time for ${eth} ETH`;
+} else {
+    document.getElementById("details").innerText =
+        `Buy ${fragments} Color Fragments for ${eth} ETH`;
+}
 
 let selectedAccount = null;
 
@@ -211,14 +218,25 @@ async function pay() {
         value: ethers.utils.parseEther(eth)
     };
 
-    const transaction = await signer.sendTransaction(tx);
-    await transaction.wait();
+    try {
+        const transaction = await signer.sendTransaction(tx);
+        await transaction.wait();
 
-    // SEND SUCCESS TO UNITY
-    fetch(`http://localhost:${callbackPort}/paymentSuccess?amount=${fragments}`);
+        // SEND SUCCESS TO UNITY
+        if (type === "time") {
+            fetch(`http://localhost:${callbackPort}/paymentSuccess?type=time&seconds=${seconds}`);
+        } else {
+            fetch(`http://localhost:${callbackPort}/paymentSuccess?type=fragments&amount=${fragments}`);
+        }
 
-    // SHOW SUCCESS SCREEN
-    showSuccess();
+        // SHOW SUCCESS SCREEN
+        showSuccess();
+    } catch (e) {
+        fetch(`http://localhost:${callbackPort}/paymentFailed?reason=${encodeURIComponent("Transaction failed or was cancelled.")}`);
+        alert("Transaction failed or was cancelled.");
+        document.getElementById("accountStatus").innerText =
+            "Purchase cancelled/failed.";
+    }
 }
 
 function shortAddress(address) {
@@ -232,7 +250,9 @@ function showSuccess(){
     document.getElementById("successScreen").style.display = "block";
 
     document.getElementById("successText").innerText =
-        `${fragments} Color Fragments added to your account!`;
+        type === "time"
+            ? `+${seconds}s time added to your account!`
+            : `${fragments} Color Fragments added to your account!`;
 
     setTimeout(()=>{
         window.close();

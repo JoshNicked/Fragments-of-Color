@@ -5,7 +5,10 @@ using System.Collections;
 
 public class GameTimer : MonoBehaviour
 {
+    private const string PurchasedTimeKey = "PurchasedTime";
+
     [Header("Timer Settings")]
+    public float baseTime = 40f;
     public float timeRemaining = 60f;
     public bool timerIsRunning = true;
     public bool isGameOver = false;
@@ -21,9 +24,15 @@ public class GameTimer : MonoBehaviour
     [Header("Gameplay Objects")]
     public MonoBehaviour[] objectsToStop;
 
+    private float saveInterval = 1f;
+    private float saveTimer = 0f;
+
     void Start()
     {
         Time.timeScale = 1f;
+
+        float purchasedTime = PlayerPrefs.GetFloat(PurchasedTimeKey, 0f);
+        timeRemaining = baseTime + purchasedTime;
 
         timerIsRunning = true;
         isGameOver = false;
@@ -31,52 +40,99 @@ public class GameTimer : MonoBehaviour
         foreach (var obj in objectsToStop)
             if (obj != null) obj.enabled = true;
 
-        gameOverPanel.SetActive(true);
-        gameOverCanvasGroup.alpha = 0f;
-        gameOverCanvasGroup.interactable = false;
-        gameOverCanvasGroup.blocksRaycasts = false;
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(true);
+
+        if (gameOverCanvasGroup != null)
+        {
+            gameOverCanvasGroup.alpha = 0f;
+            gameOverCanvasGroup.interactable = false;
+            gameOverCanvasGroup.blocksRaycasts = false;
+        }
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        DisplayTime(timeRemaining);
+        SaveTime();
     }
 
     void Update()
     {
-        if (timerIsRunning)
+        if (!timerIsRunning)
+            return;
+
+        timeRemaining -= Time.unscaledDeltaTime;
+
+        if (timeRemaining <= 0f)
         {
-            if (timeRemaining > 0)
-            {
-                // Timer runs even if game is paused/menu open
-                timeRemaining -= Time.unscaledDeltaTime;
-                DisplayTime(timeRemaining);
-            }
-            else
-            {
-                // Time's up → Game Over
-                timeRemaining = 0;
-                timerIsRunning = false;
-                isGameOver = true;
+            timeRemaining = 0f;
+            timerIsRunning = false;
+            isGameOver = true;
+            DisplayTime(timeRemaining);
 
-                // Force close menu if open
-                MenuManage menu = FindObjectOfType<MenuManage>();
-                if (menu != null)
-                    menu.ForceCloseMenu();
+            MenuManage menu = FindObjectOfType<MenuManage>();
+            if (menu != null)
+                menu.ForceCloseMenu();
 
-                Time.timeScale = 1f;
+            Time.timeScale = 1f;
+            StartCoroutine(FadeInGameOver());
+            return;
+        }
 
-                StartCoroutine(FadeInGameOver());
-            }
+        DisplayTime(timeRemaining);
+
+        saveTimer += Time.unscaledDeltaTime;
+        if (saveTimer >= saveInterval)
+        {
+            SaveTime();
+            saveTimer = 0f;
         }
     }
 
     void DisplayTime(float timeToDisplay)
     {
-        timeToDisplay += 1;
-
-        float minutes = Mathf.FloorToInt(timeToDisplay / 60);
-        float seconds = Mathf.FloorToInt(timeToDisplay % 60);
-
+        float clampedTime = Mathf.Max(0f, timeToDisplay);
+        float minutes = Mathf.FloorToInt(clampedTime / 60);
+        float seconds = Mathf.FloorToInt(clampedTime % 60);
         timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+    }
+
+    public void AddTime(float seconds)
+    {
+        if (seconds <= 0f)
+            return;
+
+        timeRemaining += seconds;
+        timerIsRunning = true;
+        isGameOver = false;
+
+        float purchasedTime = PlayerPrefs.GetFloat(PurchasedTimeKey, 0f) + seconds;
+        PlayerPrefs.SetFloat(PurchasedTimeKey, purchasedTime);
+        PlayerPrefs.Save();
+
+        DisplayTime(timeRemaining);
+    }
+
+    public void ResetTimer()
+    {
+        float purchasedTime = PlayerPrefs.GetFloat(PurchasedTimeKey, 0f);
+        timeRemaining = baseTime + purchasedTime;
+        timerIsRunning = true;
+        isGameOver = false;
+        DisplayTime(timeRemaining);
+        SaveTime();
+    }
+
+    public void SaveTime()
+    {
+        PlayerPrefs.SetFloat("SavedTimeRemaining", timeRemaining);
+        PlayerPrefs.Save();
+    }
+
+    public float GetPurchasedTime()
+    {
+        return PlayerPrefs.GetFloat(PurchasedTimeKey, 0f);
     }
 
     IEnumerator FadeInGameOver()
@@ -102,6 +158,9 @@ public class GameTimer : MonoBehaviour
     // ✅ Retry current level
     public void RetryGame()
     {
+        PlayerPrefs.SetFloat("SavedTimeRemaining", 0f);
+        PlayerPrefs.Save();
+
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
