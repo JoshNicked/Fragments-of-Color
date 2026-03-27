@@ -15,11 +15,15 @@ public class BoxInteraction : MonoBehaviour
     public Transform playerTransform;
     public PlayerMotor playerMotor;
 
+    [Header("Audio Settings")]
+    public AudioClip boxSound;
+
     [HideInInspector]
     public bool isRotationLocked = false;
 
     private Rigidbody boxRigidbody;
     private BoxCollider boxCollider;
+    private AudioSource audioSource;
 
     void Start()
     {
@@ -28,6 +32,10 @@ public class BoxInteraction : MonoBehaviour
 
         boxRigidbody = GetComponent<Rigidbody>();
         boxCollider = GetComponent<BoxCollider>();
+        audioSource = GetComponent<AudioSource>();
+
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
 
         if (boxRigidbody != null)
             boxRigidbody.isKinematic = true;
@@ -52,6 +60,14 @@ public class BoxInteraction : MonoBehaviour
 
             MoveBoxWithPlayer();
             LockPlayerRotationTowardBox();
+
+            // Play box sound if it's not already playing
+            if (boxSound != null && audioSource != null && !audioSource.isPlaying)
+            {
+                audioSource.clip = boxSound;
+                audioSource.loop = true;
+                audioSource.Play();
+            }
         }
         else
         {
@@ -59,6 +75,12 @@ public class BoxInteraction : MonoBehaviour
 
             if (boxRigidbody != null)
                 boxRigidbody.isKinematic = true;
+
+            // Stop box sound when not moving
+            if (audioSource != null && audioSource.isPlaying)
+            {
+                audioSource.Stop();
+            }
         }
     }
 
@@ -123,5 +145,13 @@ public class BoxInteraction : MonoBehaviour
                 playerTransform.rotation,
                 Quaternion.LookRotation(lookDir),
                 15f * Time.fixedDeltaTime);
+    }
+
+    public void SetBoxSoundVolume(float volume)
+    {
+        if (audioSource != null)
+        {
+            audioSource.volume = Mathf.Clamp01(volume);
+        }
     }
 }
