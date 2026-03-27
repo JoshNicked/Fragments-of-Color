@@ -6,7 +6,7 @@ public class ThirdPersonCamera : MonoBehaviour
     public float sensitivity = 120f;
     public float distance = 0f;
     public float minDistance = 2f;
-    public float maxDistance = 2f;
+    public float maxDistance = 4f;
     [Range(0f, 80f)]
     public float maxLookAngle = 35f;
     public float smoothSpeed = 15f;
