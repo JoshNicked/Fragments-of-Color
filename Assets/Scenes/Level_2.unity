@@ -9252,9 +9252,9 @@ MonoBehaviour:
   timeRemaining: 90
   timerIsRunning: 1
   isGameOver: 0
-  timerText: {fileID: 0}
-  gameOverPanel: {fileID: 0}
-  gameOverCanvasGroup: {fileID: 0}
+  timerText: {fileID: 648833715}
+  gameOverPanel: {fileID: 1702184278}
+  gameOverCanvasGroup: {fileID: 1702184280}
   fadeDuration: 1
   objectsToStop: []
 --- !u!4 &1168201413
