@@ -1,45 +1,44 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
-public class ToLevels : MonoBehaviour
+public class CompleteLevelSlideshow : MonoBehaviour
 {
     [Header("Slideshow Settings")]
     public GameObject slideshowPanel;   // panel (no fade)
     public RawImage slideshowImage;     // fades
-    public Texture[] slides;
+    public Texture slide;               // single image
 
     public float fadeDuration = 1f;
     public float displayDuration = 2f;
 
-    // ===== BUTTON CALL =====
-    public void LoadSceneTutorial(int sceneIndex)
+    public int landingSceneIndex = 0;   // landing scene
+
+    // ===== BUTTON FUNCTION =====
+    public void OnCompleteLevel()
     {
-        StartCoroutine(PlaySlideshowThenLoad());
+        StartCoroutine(ShowImageThenLoad());
     }
 
-    // ===== SLIDESHOW =====
-    IEnumerator PlaySlideshowThenLoad()
+    // ===== SHOW IMAGE =====
+    IEnumerator ShowImageThenLoad()
     {
         slideshowPanel.SetActive(true);
 
-        for (int i = 0; i < slides.Length; i++)
-        {
-            slideshowImage.texture = slides[i];
+        slideshowImage.texture = slide;
 
-            // Fade in
-            yield return StartCoroutine(FadeImage(0, 1));
+        // Fade in
+        yield return StartCoroutine(FadeImage(0, 1));
 
-            // Stay visible
-            yield return new WaitForSeconds(displayDuration);
+        // Stay visible
+        yield return new WaitForSeconds(displayDuration);
 
-            // Fade out
-            yield return StartCoroutine(FadeImage(1, 0));
-        }
+        // Fade out
+        yield return StartCoroutine(FadeImage(1, 0));
 
-        // AFTER slideshow → go to Tutorial Scene
-        SceneManager.LoadScene(1);
+        // Go to Landing Scene
+        SceneManager.LoadScene(landingSceneIndex);
     }
 
     IEnumerator FadeImage(float startAlpha, float endAlpha)
