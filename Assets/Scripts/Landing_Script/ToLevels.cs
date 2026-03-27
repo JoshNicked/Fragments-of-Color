@@ -20,5 +20,15 @@ public class ToLevels : MonoBehaviour
         SceneManager.LoadScene(2);
     }
 
+    public void LoadSceneLevel2(int sceneIndex)
+    {
+        SceneManager.LoadScene(3);
+    }
+
+    public void LoadSceneLevel3(int sceneIndex)
+    {
+        SceneManager.LoadScene(4);
+    }
+
 
 }
