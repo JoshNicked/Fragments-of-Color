@@ -15,6 +15,7 @@ public class LevelCompleteAll : MonoBehaviour
     public float fadeDuration = 1f;
     public float displayDuration = 2f;
 
+    public bool isPaused = false;
     // ===== BUTTON FUNCTION =====
     public void OnNextLevel()
     {
@@ -24,6 +25,13 @@ public class LevelCompleteAll : MonoBehaviour
         PlayerPrefs.Save();
 
         Time.timeScale = 1f;
+
+        
+        isPaused = !isPaused;
+        Time.timeScale = isPaused ? 0f : 1f;
+
+        Cursor.lockState = isPaused ? CursorLockMode.None : CursorLockMode.Locked;
+        Cursor.visible = isPaused;
 
         StartCoroutine(PlaySlideshowThenLoad());
     }
