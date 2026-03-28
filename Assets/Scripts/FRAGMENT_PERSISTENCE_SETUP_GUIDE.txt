@@ -1,0 +1,228 @@
+FRAGMENT PERSISTENCE SYSTEM - COMPLETE SETUP GUIDE
+===================================================
+
+This system allows players to collect fragments in Level 1, and have them automatically
+available in Level 2 and Level 3. Fragments persist across scene loads using PlayerPrefs.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PART 1: SETUP FRAGMENT REGISTRY
+================================
+
+A. Create FragmentRegistry in Level_1:
+   1. Open Level_1.unity
+   2. Create empty GameObject: Right-click > Create Empty
+   3. Name it: "FragmentRegistry"
+   4. Attach script: Drag "FragmentRegistry.cs" to the GameObject
+   5. In Inspector, set "Fragments" size = number of fragments (e.g., 3)
+   
+B. Configure Fragment Entries:
+   For each fragment (blue_fragment, etc.):
+   
+   Element 0 - Blue Fragment:
+   ├─ Fragment Name: "blue_fragment"  [MUST MATCH prefab name]
+   ├─ Icon: [Drag the blue fragment sprite]
+   └─ Prefab: [Drag the blue fragment prefab]
+   
+   Element 1 - Red Fragment:
+   ├─ Fragment Name: "red_fragment"
+   ├─ Icon: [Red fragment sprite]
+   └─ Prefab: [Red fragment prefab]
+   
+   Element 2 - Green Fragment:
+   ├─ Fragment Name: "green_fragment"
+   ├─ Icon: [Green fragment sprite]
+   └─ Prefab: [Green fragment prefab]
+
+C. Repeat for Level_2.unity and Level_3.unity:
+   - Create the same FragmentRegistry with IDENTICAL entries
+   - ALL levels must have the same fragment list!
+   - Fragment names must match EXACTLY (case-sensitive)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PART 2: VERIFY HOTBAR SYSTEM CONFIGURATION
+===========================================
+
+In each level, find the Player GameObject and select HotbarSystem component:
+
+Required Settings:
+  □ slotImages: 5 Image elements (for UI hotbar display)
+  □ handPoint: Transform at player's hand (where items appear)
+  □ playerAnimator: Player's Animator component
+  ✓ autoLoadFragments: CHECKED/ENABLED (must be TRUE)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PART 3: ENSURE FRAGMENT PREFABS ARE NAMED CORRECTLY
+====================================================
+
+This is CRITICAL - names must match registry entries!
+
+Example:
+  FragmentRegistry Entry:    Fragment Name = "blue_fragment"
+  Prefab in Project:         GameObject name = "blue_fragment"
+  ChestInteraction prefab:   fragmentData.prefab.name = "blue_fragment"
+
+Check in Project Files:
+  Assets/Prefabs/blue_fragment.prefab (or wherever they are)
+  └─ The GameObject inside must be named "blue_fragment"
+
+If names don't match:
+  ✗ WRONG: prefab named "BlueFragment" with registry entry "blue_fragment"
+  ✓ CORRECT: both named "blue_fragment" (exact match, case matters!)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PART 4: HOW IT WORKS (FLOW)
+============================
+
+Level 1 - Collecting Fragment:
+┌─────────────────────────────────────────────────────┐
+│ 1. Player finds chest, opens it (F key)             │
+│ 2. Fragment floats out                              │
+│ 3. Player presses E to collect                      │
+│ 4. ChestInteraction calls: hotbar.AddItem(...)      │
+│ 5. HotbarSystem saves to PlayerPrefs                │
+│    └─ PlayerPrefs key: "Hotbar_Slot_0"             │
+│    └─ PlayerPrefs value: "blue_fragment"            │
+│ 6. Fragment icon appears in hotbar slot 1           │
+│ 7. Player presses 1 to equip                        │
+│ 8. Fragment spawns in hand                          │
+└─────────────────────────────────────────────────────┘
+
+Level 1 → Level 2 transition:
+┌─────────────────────────────────────────────────────┐
+│ 1. Level_1 unloads                                  │
+│ 2. Level_2 loads                                    │
+│ 3. HotbarSystem.Start() executes                    │
+│ 4. start() calls LoadHotbar()                       │
+│ 5. LoadHotbar() reads PlayerPrefs                   │
+│    └─ Finds "Hotbar_Slot_0" = "blue_fragment"     │
+│ 6. Looks up "blue_fragment" in FragmentRegistry     │
+│ 7. Reconstructs hotbar with all collected fragments │
+│ 8. Blue fragment appears in hotbar slot 1 again     │
+│ 9. Player can equip it again with press 1           │
+└─────────────────────────────────────────────────────┘
+
+Level 2 → Level 3 transition:
+  Same as Level 1 → Level 2
+  Fragments continue to persist!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PART 5: TESTING
+===============
+
+Quick Test (Test Collecting a Fragment):
+  1. Open Level_1 in Editor
+  2. Press Play
+  3. Find a chest, open it (F key)
+  4. Collect the fragment (E key)
+  5. Verify slot 1 shows the fragment icon
+  6. Open a new Level_2 (File > Open Scene or drag into Hierarchy)
+  7. Press Play
+  8. Verify fragment still appears in slot 1
+  ✓ If it appears: System working!
+  ✗ If it doesn't appear: Check troubleshooting below
+
+Verify Registry Setup:
+  1. In Level_2, open FragmentRegistry GameObject in Hierarchy
+  2. Check Inspector for "Fragments" array
+  3. Verify all entries match Level_1 registry
+  4. Compare fragment names with prefab names
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PART 6: TROUBLESHOOTING
+=======================
+
+Problem: Fragments don't appear in next level
+Solution:
+  □ Check FragmentRegistry exists in BOTH levels
+  □ Check "autoLoadFragments" is enabled in HotbarSystem
+  □ Check fragment names match EXACTLY (case-sensitive)
+  □ Open Unity Console (Ctrl+Shift+C) for error messages
+  □ Check if "PlayerPrefs" key exists: Window > Analysis > Profiler > Memory
+
+Problem: Wrong fragment appears or no fragment
+Solution:
+  □ Verify prefab names match registry entries
+  □ Check FragmentRegistry has all needed fragments configured
+  □ Look at Console for "[Hotbar]" debug messages
+
+Problem: Fragments accumulate incorrectly or duplicates appear
+Solution:
+  □ ClearSavedFragments before testing
+  □ In Tests, add this line to start of test scene:
+     HotbarSystem hotbar = FindObjectOfType<HotbarSystem>();
+     hotbar.ClearSavedFragments();
+
+To Clear All Saved Data:
+  Add this to any script Start():
+     HotbarSystem hotbar = FindObjectOfType<HotbarSystem>();
+     hotbar.ClearSavedFragments();
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PART 7: ADVANCED USAGE
+======================
+
+Manually Check if Fragment Collected:
+  HotbarSystem hotbar = FindObjectOfType<HotbarSystem>();
+  if (hotbar.HasFragment("blue_fragment"))
+  {
+      // Player has blue_fragment
+  }
+
+Manually Remove a Fragment:
+  hotbar.RemoveItem(0);  // Remove from slot 0
+
+Manually Save (auto-saved on AddItem, but can force):
+  hotbar.SaveHotbar();
+
+Manually Load Fragments:
+  hotbar.LoadHotbar();
+
+Get First Empty Slot:
+  int emptySlot = hotbar.GetFirstEmptySlot();
+  if (emptySlot >= 0)
+      hotbar.AddItem(sprite, prefab);
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+COMMON MISTAKES TO AVOID
+=========================
+
+✗ MISTAKE #1: Fragment names in registry don't match prefab names
+  Example: Registry says "blue_fragment" but prefab is named "BlueFrag"
+  Result: LoadHotbar() won't find the fragment
+  Fix: Make sure names match EXACTLY
+
+✗ MISTAKE #2: FragmentRegistry only in Level_1, not in Level_2/3
+  Example: Created registry in Level_1 but forgot Level_2
+  Result: Fragments disappear when entering Level_2
+  Fix: Create identical registry in all levels
+
+✗ MISTAKE #3: autoLoadFragments is disabled
+  Example: Checkbox unchecked in HotbarSystem
+  Result: LoadHotbar() never gets called
+  Fix: Enable autoLoadFragments in Inspector
+
+✗ MISTAKE #4: Different fragment entries in different levels
+  Example: Level_1 registry has "blue_fragment", "red_fragment"
+           Level_2 registry only has "blue_fragment"
+  Result: Unpredictable behavior
+  Fix: Keep all registries identical
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SUMMARY
+=======
+
+✓ Create FragmentRegistry in all levels with matching entries
+✓ Set fragment names = prefab names (case-sensitive)
+✓ Enable autoLoadFragments in HotbarSystem
+✓ Test: collect in Level_1 → verify appears in Level_2
+
+That's it! Fragments now persist across levels.

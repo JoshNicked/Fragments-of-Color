@@ -943,6 +943,7 @@ MonoBehaviour:
   isGrounded: 0
   cameraTransform: {fileID: 2083801377}
   isInteractingWithChest: 0
+  inputFrozen: 0
   boxInteraction: {fileID: 284827658}
 --- !u!4 &67445218 stripped
 Transform:
@@ -1006,16 +1007,22 @@ MonoBehaviour:
   items:
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   handPoint: {fileID: 1863123588}
   playerAnimator: {fileID: 0}
+  autoLoadFragments: 1
 --- !u!1 &71149909
 GameObject:
   m_ObjectHideFlags: 0
@@ -13537,6 +13544,60 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1273544948
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1273544950}
+  - component: {fileID: 1273544949}
+  m_Layer: 0
+  m_Name: FragmentRegistry
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1273544949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1273544948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d272af3b606a50d43adac768e1a80b13, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fragments:
+  - fragmentName: Blue_Fragment
+    icon: {fileID: 21300000, guid: 4744ff9685564d140a2ee1816f8484c2, type: 3}
+    prefab: {fileID: 9040618588839836774, guid: cdb7b6d00c899da47b080c4403f90ce6, type: 3}
+  - fragmentName: Green_Fragment
+    icon: {fileID: 21300000, guid: 3c60d47ea378ec4459cfbc4586ac894f, type: 3}
+    prefab: {fileID: 1356885382781245360, guid: bb765645cb7274e45bc053e311df2eda, type: 3}
+  - fragmentName: Red_Fragment
+    icon: {fileID: 21300000, guid: 8e2841e21a75c1949bbd7c1eb7dc868b, type: 3}
+    prefab: {fileID: 8229007803317575514, guid: 0eee4078997505a4bb290ef9917d0d04, type: 3}
+--- !u!4 &1273544950
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1273544948}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 20.141129, y: 0.49394011, z: 16.260214}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1279414628 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100004, guid: 8900b053e635f514499cb699d023bda6, type: 3}
@@ -19398,16 +19459,22 @@ MonoBehaviour:
   items:
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   handPoint: {fileID: 1863123588}
   playerAnimator: {fileID: 0}
+  autoLoadFragments: 1
 --- !u!1 &1873226867
 GameObject:
   m_ObjectHideFlags: 0
@@ -21343,15 +21410,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 82467063cba6d7b4ea5c025312998508, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 37.766
+      value: 37.857
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 82467063cba6d7b4ea5c025312998508, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.511
+      value: 2.88
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 82467063cba6d7b4ea5c025312998508, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 40.665
+      value: 40.642
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 82467063cba6d7b4ea5c025312998508, type: 3}
       propertyPath: m_LocalRotation.w
@@ -22127,3 +22194,4 @@ SceneRoots:
   - {fileID: 1746863579}
   - {fileID: 581427250}
   - {fileID: 921711732}
+  - {fileID: 1273544950}

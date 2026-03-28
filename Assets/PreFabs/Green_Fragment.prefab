@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6386790801937633878}
   - component: {fileID: 6090377480067743086}
   m_Layer: 6
-  m_Name: Fragment_Green
+  m_Name: Green_Fragment
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

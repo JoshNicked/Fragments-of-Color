@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class InputManagerNew : MonoBehaviour
@@ -23,11 +23,15 @@ public class InputManagerNew : MonoBehaviour
 
     void Update()
     {
+        if (motor.inputFrozen)
+            return;
         motor.ProcessMove(onFoot.Movement.ReadValue<Vector2>());
     }
 
     void LateUpdate()
     {
+        if (motor.inputFrozen)
+            return;
         cameraController.ProcessLook(onFoot.Look.ReadValue<Vector2>());
     }
 

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class PlayerMotor : MonoBehaviour
 {
@@ -17,6 +17,10 @@ public class PlayerMotor : MonoBehaviour
     public Transform cameraTransform;
     [HideInInspector]
     public bool isInteractingWithChest = false;
+
+    /// <summary>When true, movement/input scripts should ignore player input (e.g. cinematics).</summary>
+    [HideInInspector]
+    public bool inputFrozen;
     public BoxInteraction boxInteraction;
 
     private Animator animator;

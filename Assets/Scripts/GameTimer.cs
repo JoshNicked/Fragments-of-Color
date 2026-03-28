@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections;
@@ -121,6 +121,15 @@ public class GameTimer : MonoBehaviour
         timerIsRunning = true;
         isGameOver = false;
         DisplayTime(timeRemaining);
+        SaveTime();
+    }
+
+    /// <summary>
+    /// Stops the countdown without triggering game over (e.g. level-complete / shrine cinematic).
+    /// </summary>
+    public void PauseTimer()
+    {
+        timerIsRunning = false;
         SaveTime();
     }
 

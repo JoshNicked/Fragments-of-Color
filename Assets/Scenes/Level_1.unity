@@ -5696,6 +5696,60 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 310213651}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &320442636
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 320442638}
+  - component: {fileID: 320442637}
+  m_Layer: 0
+  m_Name: FragmentRegistry
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &320442637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 320442636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d272af3b606a50d43adac768e1a80b13, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fragments:
+  - fragmentName: Blue_Fragment
+    icon: {fileID: 21300000, guid: 4744ff9685564d140a2ee1816f8484c2, type: 3}
+    prefab: {fileID: 9040618588839836774, guid: cdb7b6d00c899da47b080c4403f90ce6, type: 3}
+  - fragmentName: Green_Fragment
+    icon: {fileID: 21300000, guid: 3c60d47ea378ec4459cfbc4586ac894f, type: 3}
+    prefab: {fileID: 1356885382781245360, guid: bb765645cb7274e45bc053e311df2eda, type: 3}
+  - fragmentName: Red_Fragment
+    icon: {fileID: 21300000, guid: 8e2841e21a75c1949bbd7c1eb7dc868b, type: 3}
+    prefab: {fileID: 8229007803317575514, guid: 0eee4078997505a4bb290ef9917d0d04, type: 3}
+--- !u!4 &320442638
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 320442636}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 20.141129, y: 0.49394011, z: 16.260214}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -16125,7 +16179,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 82467063cba6d7b4ea5c025312998508, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 24.48
+      value: 25.63
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 82467063cba6d7b4ea5c025312998508, type: 3}
       propertyPath: m_LocalPosition.y
@@ -16133,7 +16187,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 82467063cba6d7b4ea5c025312998508, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 11.1
+      value: 27.28
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 82467063cba6d7b4ea5c025312998508, type: 3}
       propertyPath: m_LocalRotation.w
@@ -18351,16 +18405,22 @@ MonoBehaviour:
   items:
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   handPoint: {fileID: 1491704978}
   playerAnimator: {fileID: 0}
+  autoLoadFragments: 1
 --- !u!1 &1506402585
 GameObject:
   m_ObjectHideFlags: 0
@@ -20489,10 +20549,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: LevelComplete, Assembly-CSharp
-        m_MethodName: OnNextLevel
-        m_Mode: 1
+      - m_Target: {fileID: 174610023}
+        m_TargetAssemblyTypeName: ToLevels, Assembly-CSharp
+        m_MethodName: LoadSceneLevel2
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -24376,16 +24436,22 @@ MonoBehaviour:
   items:
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   handPoint: {fileID: 1491704978}
   playerAnimator: {fileID: 0}
+  autoLoadFragments: 0
 --- !u!114 &2025038563
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24467,6 +24533,7 @@ MonoBehaviour:
   isGrounded: 0
   cameraTransform: {fileID: 2083801377}
   isInteractingWithChest: 0
+  inputFrozen: 0
   boxInteraction: {fileID: 284827658}
 --- !u!1 &2036240984
 GameObject:
@@ -25498,3 +25565,4 @@ SceneRoots:
   - {fileID: 2015905785}
   - {fileID: 1248374037}
   - {fileID: 1838306621}
+  - {fileID: 320442638}

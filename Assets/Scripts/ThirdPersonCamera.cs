@@ -37,4 +37,15 @@ public class ThirdPersonCamera : MonoBehaviour
         Vector3 position = target.position - rotation * Vector3.forward * distance;
         transform.position = position;
     }
+
+    /// <summary>Call after moving the camera externally so free-look matches the current transform.</summary>
+    public void SyncAnglesFromTransform()
+    {
+        Vector3 euler = transform.rotation.eulerAngles;
+        yaw = euler.y;
+        pitch = euler.x;
+        if (pitch > 180f)
+            pitch -= 360f;
+        pitch = Mathf.Clamp(pitch, -maxLookAngle, maxLookAngle);
+    }
 }
