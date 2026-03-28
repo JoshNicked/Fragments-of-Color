@@ -9,12 +9,7 @@ public class ObjectiveSuccess : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            uiPanel.SetActive(true);
-            isPaused = !isPaused;
-            Time.timeScale = isPaused ? 0f : 1f;
-
-            Cursor.lockState = isPaused ? CursorLockMode.None : CursorLockMode.Locked;
-            Cursor.visible = isPaused;
+            TriggerSuccess();
         }
     }
 
@@ -24,5 +19,15 @@ public class ObjectiveSuccess : MonoBehaviour
         {
             uiPanel.SetActive(false);
         }
+    }
+
+    public void TriggerSuccess()
+    {
+        uiPanel.SetActive(true);
+        isPaused = !isPaused;
+        Time.timeScale = isPaused ? 0f : 1f;
+
+        Cursor.lockState = isPaused ? CursorLockMode.None : CursorLockMode.Locked;
+        Cursor.visible = isPaused;
     }
 }

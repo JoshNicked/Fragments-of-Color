@@ -9,6 +9,7 @@ public class ChestInteraction : MonoBehaviour
 
     private HotbarSystem hotbar;
     private PlayerMotor playerMotor;
+    private ObjectiveSuccess objectiveSuccess;
 
     public Transform player;
     public float pickupDistance = 4f;
@@ -27,6 +28,7 @@ public class ChestInteraction : MonoBehaviour
         hotbar = FindObjectOfType<HotbarSystem>();
         animator = GetComponent<Animator>();
         playerMotor = player.GetComponent<PlayerMotor>();
+        objectiveSuccess = FindObjectOfType<ObjectiveSuccess>();
 
         // Spawn fragment but keep hidden
         if (fragmentData != null && fragmentData.prefab != null)
@@ -68,6 +70,12 @@ public class ChestInteraction : MonoBehaviour
                     fragmentInstance.SetActive(false);
                     hasGivenItem = true;
                     Debug.Log($"[Chest] Picked up '{fragmentData.prefab.name}'");
+
+                    // Trigger success when fragment is picked up
+                    if (objectiveSuccess != null)
+                    {
+                        objectiveSuccess.TriggerSuccess();
+                    }
                 }
             }
         }
