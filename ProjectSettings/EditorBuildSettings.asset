@@ -12,7 +12,7 @@ EditorBuildSettings:
     path: Assets/Scenes/LeTutorial.unity
     guid: 577d3beb3a4862147badf2a914ce43af
   - enabled: 1
-    path: Assets/Scenes/Level_1.unity
+    path: Assets/Scenes/Level_1po.unity
     guid: 51d03425280b41a4a8d0326dc53acda2
   - enabled: 1
     path: Assets/Scenes/Level_2.unity
