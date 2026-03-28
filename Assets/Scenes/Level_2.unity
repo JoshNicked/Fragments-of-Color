@@ -1540,10 +1540,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1267689913}
-        m_TargetAssemblyTypeName: ToLevels, Assembly-CSharp
-        m_MethodName: LoadSceneLevel3
-        m_Mode: 3
+      - m_Target: {fileID: 1267689912}
+        m_TargetAssemblyTypeName: LevelComplete, Assembly-CSharp
+        m_MethodName: OnNextLevel
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -13529,6 +13529,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd61da7fa81bbc14a807f617b21bc7ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ToTestingLevel
+  slideshowPanel: {fileID: 0}
+  slideshowImage: {fileID: 0}
+  slides: []
+  fadeDuration: 1
+  displayDuration: 2
 --- !u!4 &1267689914
 Transform:
   m_ObjectHideFlags: 0
@@ -21320,7 +21325,7 @@ Transform:
   m_GameObject: {fileID: 2046786718}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -2.3669, y: -0.00000015953, z: 20.97}
+  m_LocalPosition: {x: -0.21, y: -0.00000015953, z: 20.97}
   m_LocalScale: {x: 1, y: 1, z: 0.6495232}
   m_ConstrainProportionsScale: 0
   m_Children: []

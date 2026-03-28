@@ -3,19 +3,28 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
-public class ToLevels : MonoBehaviour
+public class LevelCompleteAll : MonoBehaviour
 {
+    public int currentLevel = 3;
+
     [Header("Slideshow Settings")]
     public GameObject slideshowPanel;   // panel (no fade)
     public RawImage slideshowImage;     // fades
-    public Texture[] slides;
+    public Texture[] slides;            // set size = 2
 
     public float fadeDuration = 1f;
     public float displayDuration = 2f;
 
-    // ===== BUTTON CALL =====
-    public void LoadSceneTutorial(int sceneIndex)
+    // ===== BUTTON FUNCTION =====
+    public void OnNextLevel()
     {
+        int nextLevel = currentLevel + 1;
+
+        PlayerPrefs.SetInt("Level" + nextLevel + "Unlocked", 1);
+        PlayerPrefs.Save();
+
+        Time.timeScale = 1f;
+
         StartCoroutine(PlaySlideshowThenLoad());
     }
 
@@ -23,6 +32,7 @@ public class ToLevels : MonoBehaviour
     IEnumerator PlaySlideshowThenLoad()
     {
         slideshowPanel.SetActive(true);
+        Canvas.ForceUpdateCanvases(); // remove delay
 
         for (int i = 0; i < slides.Length; i++)
         {
@@ -38,8 +48,8 @@ public class ToLevels : MonoBehaviour
             yield return StartCoroutine(FadeImage(1, 0));
         }
 
-        // AFTER slideshow → go to Tutorial Scene
-        SceneManager.LoadScene(1);
+        // After slideshow → go to Landing Scene (0)
+        SceneManager.LoadScene(0);
     }
 
     IEnumerator FadeImage(float startAlpha, float endAlpha)
@@ -57,20 +67,5 @@ public class ToLevels : MonoBehaviour
         }
 
         slideshowImage.color = new Color(color.r, color.g, color.b, endAlpha);
-    }
-
-    public void LoadSceneLevel1(int sceneIndex)
-    {
-        SceneManager.LoadScene(2);
-    }
-
-    public void LoadSceneLevel2(int sceneIndex)
-    {
-        SceneManager.LoadScene(3);
-    }
-
-    public void LoadSceneLevel3(int sceneIndex)
-    {
-        SceneManager.LoadScene(4);
     }
 }

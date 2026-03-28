@@ -555,7 +555,8 @@ MonoBehaviour:
   isGrounded: 0
   cameraTransform: {fileID: 221965370}
   isInteractingWithChest: 0
-  boxInteraction: {fileID: 0}
+  inputFrozen: 0
+  boxInteraction: {fileID: 1941285761}
 --- !u!4 &67445218 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: fc1b2a50f9ec45141b5ec9a902dbe84c, type: 3}
@@ -595,6 +596,7 @@ MonoBehaviour:
   interactPrompt: {fileID: 1364838210}
   playerTransform: {fileID: 67445218}
   playerMotor: {fileID: 67445216}
+  boxSound: {fileID: 0}
   isRotationLocked: 0
 --- !u!114 &67445223
 MonoBehaviour:
@@ -617,16 +619,22 @@ MonoBehaviour:
   items:
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   handPoint: {fileID: 1863123588}
   playerAnimator: {fileID: 0}
+  autoLoadFragments: 1
 --- !u!1 &82702620 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100002, guid: 8900b053e635f514499cb699d023bda6, type: 3}
@@ -15781,16 +15789,22 @@ MonoBehaviour:
   items:
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   - icon: {fileID: 0}
     prefab: {fileID: 0}
+    prefabName: 
   handPoint: {fileID: 1863123588}
   playerAnimator: {fileID: 0}
+  autoLoadFragments: 1
 --- !u!1001 &1876222119
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16453,6 +16467,7 @@ MonoBehaviour:
   interactPrompt: {fileID: 1364838210}
   playerTransform: {fileID: 67445218}
   playerMotor: {fileID: 67445216}
+  boxSound: {fileID: 0}
   isRotationLocked: 0
 --- !u!4 &1941285762
 Transform:

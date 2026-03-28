@@ -11,6 +11,10 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class FragmentPlacementShrine : MonoBehaviour
 {
+    [Header("UI")]
+    [SerializeField] GameObject revealPanel;
+    [SerializeField] float panelDelay = 8f;
+
     [Header("References")]
     [SerializeField] Transform player;
     [SerializeField] PlayerMotor playerMotor;
@@ -222,6 +226,21 @@ public class FragmentPlacementShrine : MonoBehaviour
 
         yield return AnimateColorReveal();
 
+        // wait 5 seconds before showing panel
+        yield return new WaitForSeconds(panelDelay);
+
+        if (revealPanel != null)
+        {
+            revealPanel.SetActive(true);
+
+            // Pause the game
+            Time.timeScale = 0f;
+
+            // Show and unlock cursor
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+
         GameTimer gameTimer = FindObjectOfType<GameTimer>();
         if (gameTimer != null)
             gameTimer.PauseTimer();
@@ -330,5 +349,18 @@ public class FragmentPlacementShrine : MonoBehaviour
         placementComplete = true;
         placedCount = 3;
         HideBeamAndParticles();
+    }
+
+    public void CloseRevealPanel()
+    {
+        if (revealPanel != null)
+            revealPanel.SetActive(false);
+
+        // Resume game
+        Time.timeScale = 1f;
+
+        // Hide and lock cursor again
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 }
